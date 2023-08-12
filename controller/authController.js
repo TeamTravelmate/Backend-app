@@ -2,16 +2,21 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const secretKey = crypto.randomBytes(32).toString('hex');
-const { User } = require('../models');
+const {User} = require('../models');
 
 const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, firstName, lastName, birthday, gender, phoneNo} = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      username,
+      firstName,
+      lastName,
+      birthday,
+      gender,
+      username,      
       email,
+      phoneNo,
       password: hashedPassword,
     });
 
@@ -24,6 +29,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
+    // Get user input
     const { email, password } = req.body;
 
     const user = await User.findOne({ where: { email } });
