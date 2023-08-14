@@ -14,7 +14,7 @@ const TripController = {
         userId
       });
 
-      res.status(201).json(trip);
+      res.status(201).json({status: true ,trip});
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal server error' });
