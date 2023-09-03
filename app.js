@@ -33,6 +33,11 @@ app.post('/register', register);
 app.post('/login', login);
 
 app.post('/trip', TripController.createTrip);
+
+app.get('/trip/:userId', TripController.getTrips);
+
+app.get('/get-trip/:id', TripController.getTripsById);
+
 app.post('/trip-add-expense', TripController.createExpense);
 
 

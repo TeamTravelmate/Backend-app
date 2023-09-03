@@ -12,6 +12,18 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
+
+    static findByUserId(userId) {
+      return this.findAll({
+        where: { userId }
+      });
+    }
+
+    static findById(id) {
+      return this.findAll({
+        where: {id}
+      });
+    }
   }
   CustomTrip.init({
     userId: DataTypes.INTEGER,
