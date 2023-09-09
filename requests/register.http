@@ -1,0 +1,13 @@
+POST http://localhost:3000/user/register
+Content-Type: application/json
+
+{
+  "username": "example_user",
+  "email": "luqman_fx@email.com",
+  "password": "example_password",
+  "firstName": "John",
+  "lastName": "Doe",
+  "birthday": "1990-01-01",
+  "gender": "Male",
+  "phoneNo": "1234567890"
+}

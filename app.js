@@ -1,10 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
-const cors = require('cors');
+require('dotenv').config();
+const crypto = require('crypto');
+const secretKey = crypto.randomBytes(32).toString('hex');
 const { sequelize } = require('./models');
+
+
 const { register, login } = require('./controller/authController');
 const TripController = require('./controller/tripController');
+const UserController = require('./controller/userController');
 
 const app = express();
 const port = 3000;
@@ -25,20 +29,11 @@ sequelize
 
 //  Requests and Responses
 app.get('/', (req, res) => {
-  res.send('Welcome to the authentication app!');
+  res.send('Welcome to TRAVELMATE!');
 })
 
-app.post('/register', register);
-
-app.post('/login', login);
-
-app.post('/trip', TripController.createTrip);
-
-app.get('/trip/:userId', TripController.getTrips);
-
-app.get('/get-trip/:id', TripController.getTripsById);
-
-app.post('/trip-add-expense', TripController.createExpense);
+app.use('/user', UserController);
+app.use('/trip', TripController);
 
 
 

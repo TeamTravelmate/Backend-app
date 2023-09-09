@@ -1,0 +1,10 @@
+POST http://localhost:3000/trip
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZmlyc3ROYW1lIjoiSm9obiIsImxhc3ROYW1lIjoiRG9lIiwiaWF0IjoxNjk0MjQwMDcyLCJleHAiOjE2OTQzMjY0NzJ9.2hWnQPpHX4MPrNJtKkYcIQbgp7tEjL6oK_jcXhqbUIE
+
+{
+    "startDate":"05/29/2023",
+    "numberOfDays": "3",
+    "startPlace": "Colombo",
+    "category": "Custom"
+}
