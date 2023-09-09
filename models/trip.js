@@ -19,6 +19,22 @@ module.exports = (sequelize, DataTypes) => {
     no_of_days: DataTypes.INTEGER,
     starting_place: DataTypes.STRING,
     user_id: DataTypes.INTEGER,
+    destination:{
+      type: DataTypes.STRING,
+      allowNull:true,
+    },
+    children_count:{
+      type: DataTypes.INTEGER,
+      allowNull:true,
+    },
+    adult_count:{
+      type: DataTypes.INTEGER,
+      allowNull:true,
+    },
+    route_id:{
+      type: DataTypes.INTEGER,
+      allowNull:true,
+    }
   }, {
     sequelize,
     modelName: 'trip',
