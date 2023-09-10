@@ -3,11 +3,11 @@ Content-Type: application/json
 
 {
   "username": "example_user",
-  "email": "luqman_fx@email.com",
+  "email": "luqman_fz@email.com",
   "password": "example_password",
-  "firstName": "John",
-  "lastName": "Doe",
-  "birthday": "1990-01-01",
+  "firstName": "Luqman",
+  "lastName": "Fazal",
+  "birthday": "2000-05-29",
   "gender": "Male",
   "phoneNo": "1234567890"
 }

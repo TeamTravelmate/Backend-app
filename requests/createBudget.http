@@ -1,0 +1,18 @@
+POST http://localhost:3000/trip/budget/1 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoibHVxbWFuX2Z6QGVtYWlsLmNvbSIsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJpYXQiOjE2OTQzNDAzNTUsImV4cCI6MTY5NDM0Mzk1NX0.lCZcv9KizDTGlM-bopWcvEUykGGfBBJFBOcDbweVkuc
+
+{
+  "expenses": [
+    {
+      "category": "Food",
+      "expense_name": "Lunch",
+      "amount": 500.00
+    },
+    {
+      "category": "Transportation",
+      "expense_name": "Taxi",
+      "amount": 100.00
+    }
+  ]
+}
