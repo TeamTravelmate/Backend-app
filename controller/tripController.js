@@ -7,6 +7,7 @@ const {
   sequelize
 } = require('../models');
 const validateUser = require('../middleware/validateUser');
+const {getTripBudgetId} = require('../helpers/getBudgetId');
 const {
   getCategoryId
 } = require('../helpers/categoryCheck');
@@ -67,13 +68,12 @@ router.get('/:id', async (req, res) => {
 });
 
 // $baseUrl/trip/tripId PUT updates a specific trip
-router.put('/:id', validateUser, async (req, res) => {
-  console.log(req.body);
-  console.log(req.user.userId);
+router.put('/', validateUser, async (req, res) => {
+  const tripId = req.body.id;
   try {
     const trips = await tripModel.update(req.body, {
       where: {
-        id: req.params.id,
+        id: tripId,
         user_id: req.user.userId
       }
     });
@@ -128,15 +128,12 @@ router.post('/', validateUser, async (req, res) => {
   }
 });
 
-//***$baseurl/trip/budget/:tripId***
-
+//***$baseurl/trip/budget/***
 //post - inserting/creating a budget
-router.post('/budget/:tripId', validateUser, async (req, res) => {
+router.post('/budget', validateUser, async (req, res) => {
   try {
     const {
-      tripId
-    } = req.params;
-    const {
+      tripId,
       expenses
     } = req.body;
     const userId = req.user.userId;
@@ -195,15 +192,15 @@ router.get('/budget/:tripId', async (req, res) => {
   } = req.params;
 
   try {
-    const newBudget = await budgetModel.findOne({
+    const budget = await budgetModel.findOne({
       where: {
         tripID: tripId,
       },
       attributes: ['id', 'amount'],
-    })
+    });
     let expenses = await expenseModel.findAll({
       where: {
-        budget_id: newBudget.id,
+        budget_id: budget.id,
       },
       attributes: ['id', 'expense_name', 'amount'],
       include: [{
@@ -222,7 +219,7 @@ router.get('/budget/:tripId', async (req, res) => {
       };
     })
     res.status(200).send({
-      budget: newBudget,
+      budget: budget,
       expenses: expenses
     });
   } catch (err) {
@@ -234,19 +231,20 @@ router.get('/budget/:tripId', async (req, res) => {
 })
 
 //put - updating a budget
-router.put('/budget/:tripId', validateUser, async (req, res) => {
-  const tripId = req.params.tripId;
-  const userId = req.user.userId;
+router.put('/budget', validateUser, async (req, res) => {
 
   try {
     let {
+      trip,
       budget,
       expenses
     } = req.body;
 
     const newExpenses = [];
     let budgetAmount = 0;
-
+    if(trip){
+      budget.id = await getTripBudgetId(trip.id);
+    }
     //drop all previous expenses
     await expenseModel.destroy({
       where: {
@@ -272,7 +270,7 @@ router.put('/budget/:tripId', validateUser, async (req, res) => {
         amount: amount,
         category: categoryId,
         budget_id: budget.id,
-        userID: userId
+        userID: req.user.userId
       }, );
 
       newExpenses.push(newExpense);
@@ -289,11 +287,11 @@ router.put('/budget/:tripId', validateUser, async (req, res) => {
 
     res.status(201).send({
       message: "Updated successfully",
-      budget: {
-        id: budget.id,
-        budget_amount: budgetAmount,
-      },
-      expenses: newExpenses
+      // budget: {
+      //   id: budget.id,
+      //   budget_amount: budgetAmount,
+      // },
+      // expenses: newExpenses
     })
   } catch (err) {
     console.log(err);
@@ -303,24 +301,106 @@ router.put('/budget/:tripId', validateUser, async (req, res) => {
   };
 });
 
+//***$baseurl/trip/expense/:expenseId***
+//this is possible because each expense has a unique id
+router.delete('/expense/:expenseId', validateUser, async (req, res) => {
+  const expenseId = req.params.expenseId;
 
-//   createExpense: async (req, res) => {
-//     try {
-//       const { category, expense_name, amount, tripId } = req.body;
+  try {
+    const deletedExpense = await expenseModel.findOne({
+      where: {
+        id: expenseId
+      }
+    })
 
-//       const exp = await expenses.create({
-//         category,
-//         expense_name,
-//         amount,
-//         tripId
-//       });
+    if (deletedExpense == null) {
+      res.status(404).send({
+        message: "Expense not found"
+      })
+      return;
+    }
 
-//       res.status(201).json(exp);
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ message: 'Internal server error' });
-//     }
-//   }
-// };
+    const budget = await budgetModel.findOne({
+      where: {
+        id: deletedExpense.budget_id
+      }
+    })
 
+    budget.amount -= deletedExpense.amount;
+    await budget.save();
+    deletedExpense.destroy();
+
+    res.status(200).send({
+      message: "Deleted successfully"
+    })
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    })
+  }
+})
+
+router.put('/expense', validateUser, async (req, res) => {
+  
+  const{
+    id,
+    expense_name,
+    amount,
+    category
+  } = req.body;
+  try {
+    console.log(
+      await expenseModel.update({
+        expense_name: expense_name,
+        amount: amount,
+        category: category,
+      },
+      {
+        where:{
+          id:id
+        }
+      })
+    )
+
+
+  }catch(err){
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    })
+  }
+});
+
+router.put('/', validateUser, async (req, res) => {
+  let {
+    expenseId,
+    expenseName,
+    amount,
+    category
+  } = req.body;
+  category = capitalizeFirst(category);
+  category = getCategoryId(category);
+  try {
+    const newExpense = await expenseModel.update({
+      expense_name: expenseName,
+      amount: amount,
+      category: category,
+    }, {
+      where: {
+        id: expenseId
+      }
+    })
+
+    res.status(200).send({
+      message: "Updated successfully",
+      expense: newExpense
+    })
+  } catch (err) {
+    res.status(500).send({
+      message: "Server error"
+    })
+  }
+
+})
 module.exports = router;
