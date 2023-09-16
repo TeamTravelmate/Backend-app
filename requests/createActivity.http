@@ -1,0 +1,9 @@
+POST http://localhost:3000/trip/activity HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImVtYWlsIjoibHVxbWFuX2Z6QGVtYWlsLmNvbSIsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJpYXQiOjE2OTQ3MTcwMjksImV4cCI6MTY5NDcyMDYyOX0.uDFHLAslJFPKOST_TeUk27rthTsYujVCLGkZHM5U11w
+
+{
+    "activity_name": "Surfing",
+    "description": "Beach",
+    "location": "Unawatuna"
+}
