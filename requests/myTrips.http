@@ -1,0 +1,2 @@
+GET http://localhost:3000/trip/myTrips HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoibHVxbWFuX2Z6QGVtYWlsLmNvbSIsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJpYXQiOjE2OTQzNTgzNzksImV4cCI6MTY5NDM2MTk3OX0.RZOIzCIjpX-xJjarzSGoCYfHrzRJdL4UCtD-CErtD9M
