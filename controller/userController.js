@@ -2,7 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {
-    User
+    User:userModel
 } = require('../models');
 
 router.post('/register', async (req, res, next) => {
@@ -17,7 +17,7 @@ router.post('/register', async (req, res, next) => {
             gender,
             phoneNo
         } = req.body;
-        const checkUser = await User.findOne({
+        const checkUser = await userModel.findOne({
             where: {
                 email: email
             }
@@ -26,9 +26,10 @@ router.post('/register', async (req, res, next) => {
             res.status(400).send({
                 message: 'User already exists'
             })
+            return;
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({
+        const user = await userModel.create({
             firstName,
             lastName,
             birthday,
@@ -43,11 +44,12 @@ router.post('/register', async (req, res, next) => {
             user: user,
             message: "User created successfully",
             sessionToken: jwt.sign({
-                id: user.id,
+                userId: user.id,
                 firstName: user.firstName,
                 lastName: user.lastName,
+                email: user.email,
             }, process.env.SECRET, {
-                expiresIn: 60 * 60 * 24
+                expiresIn: 60*60*24*30
             })
         });
         console.log(user);
@@ -61,17 +63,14 @@ router.post('/register', async (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
     try {
-        const {
-            email,
-            password
-        } = req.body;
+        const {email,password} = req.body;
         //email check
-        const user = await User.findOne({
+        const user = await userModel.findOne({
             where: {
                 email
             }
         });
-        if (!user) {
+        if (user == null) {
             return res.status(401).send({
                 error: 'Invalid email or password'
             });
@@ -80,17 +79,17 @@ router.post('/login', async (req, res, next) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).send({
-                error: 'Invalid email or password $user.password'
+                error: `Invalid email or password`
             });
         }
 
         const token = jwt.sign({
             userId: user.id,
-            email: user.email,
             firstName: user.firstName,
-            lastName: user.lastName
+            lastName: user.lastName,
+            email: user.email,
         }, process.env.SECRET, {
-            expiresIn: '1h'
+            expiresIn: 60*60*24*30
         });
 
         res.status(200).send({
