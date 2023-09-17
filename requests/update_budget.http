@@ -3,13 +3,16 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZmlyc3ROYW1lIjoiTHVxbWFuIiwibGFzdE5hbWUiOiJGYXphbCIsImVtYWlsIjoibHVxbWFuX2Z6QGdtYWlsLmNvbSIsImlhdCI6MTY5NDQyMzQ2NywiZXhwIjoxNjk3MDE1NDY3fQ.IaJhVURWC9elb-gu0pH6i00qMNG2RzlWFssiAoS0yyU
 
 {
+    "trip":{
+      "id":3
+    },
     "budget": {
         "id": 11
     },
   "expenses": [
     {
       "expense_name": "Taxi",
-      "amount": 1001,
+      "amount": 4334,
       "category": "Transportation"
     },
     {

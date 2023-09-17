@@ -1,11 +1,10 @@
-const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {
     User:userModel
 } = require('../models');
 
-router.post('/register', async (req, res, next) => {
+async function register (req, res, next) {
     try {
         const {
             username,
@@ -52,16 +51,15 @@ router.post('/register', async (req, res, next) => {
                 expiresIn: 60*60*24*30
             })
         });
-        console.log(user);
     } catch (error) {
         res.status(500).send({
             message: 'Something went wrong'
         });
         console.log(error);
     }
-});
+}
 
-router.post('/login', async (req, res, next) => {
+async function login (req, res, next) {
     try {
         const {email,password} = req.body;
         //email check
@@ -103,7 +101,10 @@ router.post('/login', async (req, res, next) => {
             error: 'Internal server error'
         });
     }
-})
+}
 
 
-module.exports = router;
+module.exports = {
+    register,
+    login
+};

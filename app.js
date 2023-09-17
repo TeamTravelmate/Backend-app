@@ -2,19 +2,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const { sequelize } = require('./models');
-
-
-const { register, login } = require('./controller/authController');
-const TripController = require('./controller/tripController');
-const UserController = require('./controller/userController');
-
 const app = express();
 const port = 3000;
 
+const tripRoutes = require('./routes/tripRoutes');
+const userRoutes = require('./routes/userRoutes');
+
 app.use(bodyParser.json());
-
-const db = require('./models/');
-
 sequelize
   .authenticate()
   .then(() => {
@@ -30,8 +24,8 @@ app.get('/', (req, res) => {
   res.send('Welcome to TRAVELMATE!');
 })
 
-app.use('/user', UserController);
-app.use('/trip', TripController);
+app.use('/user', userRoutes);
+app.use('/trip', tripRoutes);
 
 
 

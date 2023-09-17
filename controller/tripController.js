@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const {
   trip: tripModel,
   expense: expenseModel,
@@ -6,21 +5,19 @@ const {
   budget_category: budget_categoryModel,
   sequelize
 } = require('../models');
-const validateUser = require('../middleware/validateUser');
-const {getTripBudgetId} = require('../helpers/getBudgetId');
+const {
+  getTripBudgetId
+} = require('../helpers/getBudgetId');
 const {
   getCategoryId
 } = require('../helpers/categoryCheck');
 const {
+  
   capitalizeFirst
 } = require('../helpers/capitalizeFirstLetter');
 
-expenseModel.belongsTo(budget_categoryModel, {
-  foreignKey: 'category'
-});
-
 // $baseUrl/trip gives all public trips
-router.get('/', async (req, res) => {
+async function getPublicTrips (req, res){
   try {
     const trips = await tripModel.findAll({
       where: {
@@ -34,10 +31,10 @@ router.get('/', async (req, res) => {
       message: "Server error"
     });
   }
-});
+}
 
 // $baseUrl/trip/myTrips gives all trips of a user
-router.get('/myTrips', validateUser, async (req, res) => {
+async function getUserTrips (req, res){
   try {
     const trips = await tripModel.findAll({
       where: {
@@ -51,13 +48,13 @@ router.get('/myTrips', validateUser, async (req, res) => {
       message: "Server error"
     });
   }
-});
+}
 
 // $baseUrl/trip/tripId gives a specific trip
-router.get('/:id', async (req, res) => {
-  console.log(req.params);
+async function getTripFromId (req, res){
+  // console.log(req.params);
   try {
-    const trips = await tripModel.findByPk(req.params.id);
+    const trips = await tripModel.findByPk(req.params.tripId);
     res.status(200).send(trips);
   } catch (err) {
     console.log(err);
@@ -65,10 +62,10 @@ router.get('/:id', async (req, res) => {
       message: "Server error"
     });
   }
-});
+}
 
-// $baseUrl/trip/tripId PUT updates a specific trip
-router.put('/', validateUser, async (req, res) => {
+// $baseUrl/trip/ PUT updates a specific trip
+async function updateTrip (req, res){
   const tripId = req.body.id;
   try {
     const trips = await tripModel.update(req.body, {
@@ -92,10 +89,10 @@ router.put('/', validateUser, async (req, res) => {
       message: "Server error"
     });
   }
-});
+}
 
 // $baseUrl/trip POST creates a new trip by the user
-router.post('/', validateUser, async (req, res) => {
+async function createTrip (req, res){
   try {
     let {
       startDate,
@@ -119,18 +116,18 @@ router.post('/', validateUser, async (req, res) => {
       message: "Trip created successfully",
       trip: newTrip
     });
-    console.log(newTrip);
+    // console.log(newTrip);
   } catch (err) {
     console.log(err);
     res.status(500).send({
       message: "Server error"
     });
   }
-});
+}
 
 //***$baseurl/trip/budget/***
 //post - inserting/creating a budget
-router.post('/budget', validateUser, async (req, res) => {
+async function createBudget (req, res){
   try {
     const {
       tripId,
@@ -183,33 +180,28 @@ router.post('/budget', validateUser, async (req, res) => {
       message: "Server error"
     });
   }
-});
+}
 
 //get - getting a budget
-router.get('/budget/:tripId', async (req, res) => {
+async function getBudget (req, res){
   const {
     tripId
   } = req.params;
-
+  console.log(req.params);
   try {
-    const budget = await budgetModel.findOne({
-      where: {
-        tripID: tripId,
-      },
+    const trip = await tripModel.findByPk(tripId);
+    const budget = await trip.getBudget({
       attributes: ['id', 'amount'],
     });
-    let expenses = await expenseModel.findAll({
-      where: {
-        budget_id: budget.id,
-      },
+
+    let expenses = await budget.getExpenses({
       attributes: ['id', 'expense_name', 'amount'],
       include: [{
         model: budget_categoryModel,
-        on: sequelize.literal('budget_category.id::text = expense.category'),
         attributes: ['category_name'],
         required: true,
       }]
-    })
+    });
     expenses = expenses.map(expense => {
       return {
         id: expense.id,
@@ -228,10 +220,10 @@ router.get('/budget/:tripId', async (req, res) => {
       message: "Server error"
     });
   }
-})
+}
 
 //put - updating a budget
-router.put('/budget', validateUser, async (req, res) => {
+async function updateBudget(req, res){
 
   try {
     let {
@@ -242,7 +234,7 @@ router.put('/budget', validateUser, async (req, res) => {
 
     const newExpenses = [];
     let budgetAmount = 0;
-    if(trip){
+    if (trip) {
       budget.id = await getTripBudgetId(trip.id);
     }
     //drop all previous expenses
@@ -299,108 +291,15 @@ router.put('/budget', validateUser, async (req, res) => {
       message: "Server error"
     });
   };
-});
+}
 
-//***$baseurl/trip/expense/:expenseId***
-//this is possible because each expense has a unique id
-router.delete('/expense/:expenseId', validateUser, async (req, res) => {
-  const expenseId = req.params.expenseId;
-
-  try {
-    const deletedExpense = await expenseModel.findOne({
-      where: {
-        id: expenseId
-      }
-    })
-
-    if (deletedExpense == null) {
-      res.status(404).send({
-        message: "Expense not found"
-      })
-      return;
-    }
-
-    const budget = await budgetModel.findOne({
-      where: {
-        id: deletedExpense.budget_id
-      }
-    })
-
-    budget.amount -= deletedExpense.amount;
-    await budget.save();
-    deletedExpense.destroy();
-
-    res.status(200).send({
-      message: "Deleted successfully"
-    })
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({
-      message: "Server error"
-    })
-  }
-})
-
-router.put('/expense', validateUser, async (req, res) => {
-  
-  const{
-    id,
-    expense_name,
-    amount,
-    category
-  } = req.body;
-  try {
-    console.log(
-      await expenseModel.update({
-        expense_name: expense_name,
-        amount: amount,
-        category: category,
-      },
-      {
-        where:{
-          id:id
-        }
-      })
-    )
-
-
-  }catch(err){
-    console.log(err);
-    res.status(500).send({
-      message: "Server error"
-    })
-  }
-});
-
-router.put('/', validateUser, async (req, res) => {
-  let {
-    expenseId,
-    expenseName,
-    amount,
-    category
-  } = req.body;
-  category = capitalizeFirst(category);
-  category = getCategoryId(category);
-  try {
-    const newExpense = await expenseModel.update({
-      expense_name: expenseName,
-      amount: amount,
-      category: category,
-    }, {
-      where: {
-        id: expenseId
-      }
-    })
-
-    res.status(200).send({
-      message: "Updated successfully",
-      expense: newExpense
-    })
-  } catch (err) {
-    res.status(500).send({
-      message: "Server error"
-    })
-  }
-
-})
-module.exports = router;
+module.exports = {
+  getPublicTrips,
+  getUserTrips,
+  getTripFromId,
+  updateTrip,
+  createTrip,
+  createBudget,
+  getBudget,
+  updateBudget
+};
