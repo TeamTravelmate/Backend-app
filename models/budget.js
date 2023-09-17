@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.trip, {foreignKey: 'tripID'});
+      this.hasMany(models.expense, {foreignKey: 'budget_id'});
     }
   }
   budget.init({
