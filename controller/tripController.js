@@ -305,7 +305,7 @@ async function updateBudget(req, res) {
 //***$baseurl/trip/location***
 
 //post - inserting location
-async function insertLocation (req, res) {
+async function insertLocation(req, res) {
   try {
     let {
       name,
@@ -332,7 +332,7 @@ async function insertLocation (req, res) {
 }
 
 //get - getting a location '/location/:id'
-async function getLocation (req, res) {
+async function getLocation(req, res) {
   const {
     id
   } = req.params;
@@ -353,7 +353,7 @@ async function getLocation (req, res) {
 }
 
 //put - updating location '/location/:id'
-async function updateLocation (req, res) {
+async function updateLocation(req, res) {
   try {
     console.log(req.body);
     const updatedLocation = await locationModel.update(req.body, {
@@ -379,7 +379,7 @@ async function updateLocation (req, res) {
 }
 
 //delete - deleting location '/location/:id'
-async function deleteLocation (req, res) {
+async function deleteLocation(req, res) {
   try {
     const deletedLocation = await locationModel.destroy({
       where: {
@@ -405,7 +405,7 @@ async function deleteLocation (req, res) {
 
 //***$baseurl/trip/activity***
 //post - inserting an activity
-async function insertActivity (req, res) {
+async function insertActivity(req, res) {
   try {
     let {
       activity_name,
@@ -437,7 +437,7 @@ async function insertActivity (req, res) {
 }
 
 //get - getting activity '/activity/:id'
-async function getActivity (req, res) {
+async function getActivity(req, res) {
   const {
     id
   } = req.params;
@@ -458,7 +458,7 @@ async function getActivity (req, res) {
 
 
 //put - updating an activity '/activity/:id'
-async function updateActivity (req, res) {
+async function updateActivity(req, res) {
   try {
     const updatedActivity = await activityModel.update(req.body, {
       where: {
@@ -486,7 +486,7 @@ async function updateActivity (req, res) {
 //***$baseurl/trip/itinerary/:tripId***
 
 //post - inserting/creating a itinerary
-async function createItinerary (req, res) {
+async function createItinerary(req, res) {
   try {
     const {
       tripId
@@ -522,7 +522,7 @@ async function createItinerary (req, res) {
 }
 
 //get - getting an itinerary
-async function getItinerary (req, res) {
+async function getItinerary(req, res) {
   const {
     tripId
   } = req.params;
@@ -566,7 +566,7 @@ async function getItinerary (req, res) {
 }
 
 //put - updating an itinerary '/itinerary/:tripId/:id'
-async function updateItinerary (req, res) {
+async function updateItinerary(req, res) {
   try {
     const {
       tripId,
@@ -616,7 +616,7 @@ async function updateItinerary (req, res) {
 }
 
 //delete - deleting an itinerary '/itinerary/:tripId/:id'
-async function deleteItinerary (req, res) {
+async function deleteItinerary(req, res) {
   const {
     tripId,
     id
@@ -667,4 +667,4 @@ module.exports = {
   getItinerary,
   updateItinerary,
   deleteItinerary,
-  };
+};
