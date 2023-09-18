@@ -650,7 +650,7 @@ async function deleteItinerary(req, res) {
 
 //***$baseurl/trip/essential/:tripId***
 //post - inserting essential '/essential/:tripId'
-async function createEssential (req, res) {
+async function createEssential(req, res) {
   try {
     const {
       tripId
@@ -680,21 +680,51 @@ async function createEssential (req, res) {
     });
   }
 }
-//get - getting an essential - search by essential name  /essential/:tripId/:essentialName
+
+//get - getting essentials '/essential/:tripId'
 async function getEssential (req, res) {
+  const {
+    tripId
+  } = req.params;
+
+  try {
+    const essentials = await tour_essentialModel.findAll({
+      where: {
+        tripID: tripId,
+      },
+      order: [
+        ['id', 'ASC'],
+      ],
+      attributes: ['id', 'essential_name', 'status'],
+    });
+    if (essentials.length === 0) {
+      res.status(404).send({
+        message: "Essential not found"
+      })
+    }
+    res.status(200).send(essentials);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//get - getting an essential - search by essential name  /essential/:tripId/:essentialName
+async function getEssentialByName(req, res) {
   const {
     tripId,
     essentialName
   } = req.params;
-  
+
   try {
     const essential = await tour_essentialModel.findOne({
       where: {
         tripID: tripId,
         essential_name: essentialName
       },
-      attributes: 
-      ['essential_name', 'status']
+      attributes: ['essential_name', 'status']
     });
     if (essential == null) {
       res.status(404).send({
@@ -708,74 +738,73 @@ async function getEssential (req, res) {
       message: "Server error"
     });
   }
-  }
-  
-  //put - updating an essential '/essential/:tripId/:id'
-  async function updatedEssential (req,res){
-    const {
-      tripId,
-      id 
-    } = req.params;
-    let {
-      status
-    } = req.body;
-  
-    try {
-      const updatedEssential = await tour_essentialModel.update(
-      {
-        status: status
-      }, {
-        where: {
-          tripID: tripId,
-          id: id,
-        }
-      });
-      if(updatedEssential[0] === 0){
-        res.status(404).send({
-          message: "Essential not found"
-        })
-      }else{
-        res.status(201).send({
-          message: "Essential updated successfully"
-        });
+}
+
+//put - updating an essential '/essential/:tripId/:id'
+async function updateEssential(req, res) {
+  const {
+    tripId,
+    id
+  } = req.params;
+  let {
+    status
+  } = req.body;
+
+  try {
+    const updatedEssential = await tour_essentialModel.update({
+      status: status
+    }, {
+      where: {
+        tripID: tripId,
+        id: id,
       }
-    } catch (err) {
-      console.log(err);
-      res.status(500).send({
-        message: "Server error"
+    });
+    if (updatedEssential[0] === 0) {
+      res.status(404).send({
+        message: "Essential not found"
+      })
+    } else {
+      res.status(201).send({
+        message: "Essential updated successfully"
       });
     }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
   }
-  //delete '/essential/:tripId/:id'
-  async function deleteEssential (req, res){
-    const {
-      tripId,
-      id
-    } = req.params;
-  
-    try {
-      const deleteEssential = await tour_essentialModel.destroy ({
-        where: {
-          tripID : tripId,
-          id: id
-        }
+}
+//delete '/essential/:tripId/:id'
+async function deleteEssential(req, res) {
+  const {
+    tripId,
+    id
+  } = req.params;
+
+  try {
+    const deleteEssential = await tour_essentialModel.destroy({
+      where: {
+        tripID: tripId,
+        id: id
+      }
+    })
+    if (deleteEssential[0] === 0) {
+      res.status(404).send({
+        message: "Essential not found"
       })
-      if(deleteEssential[0] === 0){
-        res.status(404).send({
-          message: "Essential not found"
-        })
-      }else{
+    } else {
       res.status(200).send({
         message: "Essential deleted successfully"
       });
     }
-    } catch (err){
-      console.log(err);
-      res.status(500).send({
-        message: "Server error"
-      });
-    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
   }
+}
 
 module.exports = {
   getPublicTrips,
@@ -799,6 +828,7 @@ module.exports = {
   deleteItinerary,
   createEssential,
   getEssential,
-  updatedEssential,
+  getEssentialByName,
+  updateEssential,
   deleteEssential
 };

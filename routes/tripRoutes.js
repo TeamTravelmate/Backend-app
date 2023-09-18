@@ -20,6 +20,11 @@ const {
   getItinerary,
   updateItinerary,
   deleteItinerary,
+  createEssential,
+  getEssential,
+  getEssentialByName,
+  updateEssential,
+  deleteEssential,
 } = require('../controller/tripController');
 
 // routes related to trips
@@ -51,4 +56,10 @@ router.post('/itinerary/:tripId', validateUser, createItinerary);
 router.put('/itinerary/:tripId/:id', validateUser, updateItinerary);
 router.delete('/itinerary/:tripId/:id', validateUser, deleteItinerary);
 
+//routes related to travel essentials
+router.get('/essential/:tripId', validateUser, getEssential);
+router.get('/essential/:tripId/:essentialName', validateUser, getEssentialByName);
+router.post('/essential/:tripId', validateUser, createEssential);
+router.put('/essential/:tripId/:id', validateUser, updateEssential);
+router.delete('/essential/:tripId/:id', validateUser, deleteEssential);
 module.exports = router;
