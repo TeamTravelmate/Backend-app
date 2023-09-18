@@ -7,6 +7,7 @@ const {
   location: locationModel,
   activity: activityModel,
   trip_location: trip_locationModel,
+  tour_essential: tour_essentialModel,
   sequelize
 } = require('../models');
 const validateUser = require('../middleware/validateUser');
@@ -40,6 +41,10 @@ trip_locationModel.belongsTo(locationModel, {
 
 trip_locationModel.belongsTo(activityModel, {
   foreignKey: 'activity_id'
+});
+
+tour_essentialModel.belongsTo(tripModel, {
+  foreignKey: 'tripID'
 });
 
 // $baseUrl/trip gives all public trips
@@ -770,5 +775,179 @@ router.post('/itinerary/:tripId', validateUser, async (req, res) => {
       });
     }
   });
+
+
+//***$baseurl/trip/essential/:tripId***
+
+//post - inserting essential
+router.post('/essential/:tripId', validateUser, async (req, res) => {
+  try {
+    const {
+      tripId
+    } = req.params;
+    let {
+      essential_name,
+      status
+    } = req.body;
+
+    const userId = req.user.userId;
+
+    const newEssential = await tour_essentialModel.create({
+      tripID: tripId,
+      essential_name: essential_name,
+      status: status,
+      userID: userId
+    });
+
+    res.status(201).send({
+      message: "Essential addeded successfully",
+      essential: newEssential
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+});
+
+//get - getting essentials
+router.get('/essential/:tripId', validateUser, async (req, res) => {
+  const {
+    tripId
+  } = req.params;
+
+  try {
+    const essentials = await tour_essentialModel.findAll({
+      where: {
+        tripID: tripId,
+      },
+      order: [
+        ['id', 'ASC'],
+      ],
+      attributes: ['id', 'essential_name', 'status'],
+    });
+    if (essentials.length === 0) {
+      res.status(404).send({
+        message: "Essential not found"
+      })
+    }
+    res.status(200).send(essentials);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+});
+
+//get - getting an essential - search by essential name
+router.get('/essential/:tripId/:essentialName', validateUser, async (req, res) => {
+const {
+  tripId,
+  essentialName
+} = req.params;
+
+try {
+  const essential = await tour_essentialModel.findOne({
+    where: {
+      tripID: tripId,
+      essential_name: essentialName
+    },
+    attributes: 
+    ['essential_name', 'status']
+  });
+  if (essential == null) {
+    res.status(404).send({
+      message: "Essential not found"
+    })
+  }
+  res.status(200).send(essential);
+} catch (err) {
+  console.log(err);
+  res.status(500).send({
+    message: "Server error"
+  });
+}
+});
+
+//put - updating an essential
+router.put('/essential/:tripId/:id',validateUser,async(req,res) => {
+  const {
+    tripId,
+    id 
+  } = req.params;
+  let {
+    status
+  } = req.body;
+
+  try {
+    const updatedEssential = await tour_essentialModel.update(
+    {
+      status: status
+    }, {
+      where: {
+        tripID: tripId,
+        id: id,
+      }
+    });
+    if(updatedEssential[0] === 0){
+      res.status(404).send({
+        message: "Essential not found"
+      })
+    }else{
+      res.status(201).send({
+        message: "Essential updated successfully"
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+});
+
+//delete - deleting an essential
+router.delete('/essential/:tripId/:id', validateUser, async (req, res) => {
+  const {
+    tripId,
+    id
+  } = req.params;
+
+  try {
+    const deleteEssential = await tour_essentialModel.destroy ({
+      where: {
+        tripID : tripId,
+        id: id
+      }
+    })
+    if(deleteEssential[0] === 0){
+      res.status(404).send({
+        message: "Essential not found"
+      })
+    }else{
+    res.status(200).send({
+      message: "Essential deleted successfully"
+    });
+  }
+  } catch (err){
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+});
+
+
+//***$baseurl/trip/reminder/:tripId***
+
+//post - inserting reminder
+
+//get - getting a reminder/reminders
+
+//put - updating a reminder
+
+//delete - deleting a reminder
 
 module.exports = router;
