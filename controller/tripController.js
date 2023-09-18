@@ -3,6 +3,9 @@ const {
   expense: expenseModel,
   budget: budgetModel,
   budget_category: budget_categoryModel,
+  location: locationModel,
+  activity: activityModel,
+  trip_location: trip_locationModel,
   sequelize
 } = require('../models');
 const {
@@ -12,12 +15,18 @@ const {
   getCategoryId
 } = require('../helpers/categoryCheck');
 const {
-  
+
   capitalizeFirst
 } = require('../helpers/capitalizeFirstLetter');
+const {
+  getLocationByName
+} = require('../helpers/getLocationByName');
+const {
+  getActivityByName
+} = require('../helpers/getActivityByName');
 
 // $baseUrl/trip gives all public trips
-async function getPublicTrips (req, res){
+async function getPublicTrips(req, res) {
   try {
     const trips = await tripModel.findAll({
       where: {
@@ -34,7 +43,7 @@ async function getPublicTrips (req, res){
 }
 
 // $baseUrl/trip/myTrips gives all trips of a user
-async function getUserTrips (req, res){
+async function getUserTrips(req, res) {
   try {
     const trips = await tripModel.findAll({
       where: {
@@ -51,7 +60,7 @@ async function getUserTrips (req, res){
 }
 
 // $baseUrl/trip/tripId gives a specific trip
-async function getTripFromId (req, res){
+async function getTripFromId(req, res) {
   // console.log(req.params);
   try {
     const trips = await tripModel.findByPk(req.params.tripId);
@@ -65,7 +74,7 @@ async function getTripFromId (req, res){
 }
 
 // $baseUrl/trip/ PUT updates a specific trip
-async function updateTrip (req, res){
+async function updateTrip(req, res) {
   const tripId = req.body.id;
   try {
     const trips = await tripModel.update(req.body, {
@@ -92,7 +101,7 @@ async function updateTrip (req, res){
 }
 
 // $baseUrl/trip POST creates a new trip by the user
-async function createTrip (req, res){
+async function createTrip(req, res) {
   try {
     let {
       startDate,
@@ -127,7 +136,7 @@ async function createTrip (req, res){
 
 //***$baseurl/trip/budget/***
 //post - inserting/creating a budget
-async function createBudget (req, res){
+async function createBudget(req, res) {
   try {
     const {
       tripId,
@@ -183,7 +192,7 @@ async function createBudget (req, res){
 }
 
 //get - getting a budget
-async function getBudget (req, res){
+async function getBudget(req, res) {
   const {
     tripId
   } = req.params;
@@ -223,7 +232,7 @@ async function getBudget (req, res){
 }
 
 //put - updating a budget
-async function updateBudget(req, res){
+async function updateBudget(req, res) {
 
   try {
     let {
@@ -293,6 +302,351 @@ async function updateBudget(req, res){
   };
 }
 
+//***$baseurl/trip/location***
+
+//post - inserting location
+async function insertLocation (req, res) {
+  try {
+    let {
+      name,
+      city
+    } = req.body;
+
+    const userId = req.user.userId;
+
+    const newLocation = await locationModel.create({
+      name: name,
+      city: city
+    });
+    res.status(201).send({
+      message: "Location added successfully",
+      location: newLocation
+    });
+    console.log(newLocation);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//get - getting a location '/location/:id'
+async function getLocation (req, res) {
+  const {
+    id
+  } = req.params;
+
+  try {
+    const location = await locationModel.findOne({
+      where: {
+        id: id,
+      }
+    })
+    res.status(200).send(location);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//put - updating location '/location/:id'
+async function updateLocation (req, res) {
+  try {
+    console.log(req.body);
+    const updatedLocation = await locationModel.update(req.body, {
+      where: {
+        id: req.params.id
+      }
+    });
+    if (updatedLocation[0] === 0) {
+      res.status(404).send({
+        message: "Location not found"
+      })
+    } else {
+      res.status(201).send({
+        message: "Location updated successfully"
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//delete - deleting location '/location/:id'
+async function deleteLocation (req, res) {
+  try {
+    const deletedLocation = await locationModel.destroy({
+      where: {
+        id: req.params.id
+      }
+    });
+    if (deletedLocation === 0) {
+      res.status(404).send({
+        message: "Location not found"
+      })
+    } else {
+      res.status(201).send({
+        message: "Location deleted successfully"
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//***$baseurl/trip/activity***
+//post - inserting an activity
+async function insertActivity (req, res) {
+  try {
+    let {
+      activity_name,
+      description,
+      location
+    } = req.body;
+
+    const userId = req.user.userId;
+
+    const locationData = await getLocationByName(location);
+    const locationId = locationData.id;
+
+    const newActivity = await activityModel.create({
+      activity_name: activity_name,
+      description: description,
+      lodation_id: locationId
+    });
+    res.status(201).send({
+      message: "Activity added successfully",
+      activity: newActivity
+    });
+    console.log(newActivity);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//get - getting activity '/activity/:id'
+async function getActivity (req, res) {
+  const {
+    id
+  } = req.params;
+  try {
+    const activity = await activityModel.findOne({
+      where: {
+        id: id,
+      }
+    })
+    res.status(200).send(activity);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+
+//put - updating an activity '/activity/:id'
+async function updateActivity (req, res) {
+  try {
+    const updatedActivity = await activityModel.update(req.body, {
+      where: {
+        id: req.params.id
+      }
+    });
+    if (updatedActivity[0] === 0) {
+      res.status(404).send({
+        message: "Activity not found"
+      })
+    } else {
+      res.status(201).send({
+        message: "Activity updated successfully"
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+
+//***$baseurl/trip/itinerary/:tripId***
+
+//post - inserting/creating a itinerary
+async function createItinerary (req, res) {
+  try {
+    const {
+      tripId
+    } = req.params;
+    let {
+      day,
+      location,
+      activity
+    } = req.body;
+
+    const locationData = await getLocationByName(location);
+    const locationId = locationData.id;
+
+    const activityData = await getActivityByName(activity);
+    const activityId = activityData.id;
+
+    const newItinerary = await trip_locationModel.create({
+      tripID: tripId,
+      day: day,
+      locationID: locationId,
+      activity_id: activityId,
+    });
+    res.status(201).send({
+      message: "Itinerary created successfully",
+      itinerary: newItinerary
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//get - getting an itinerary
+async function getItinerary (req, res) {
+  const {
+    tripId
+  } = req.params;
+
+  try {
+    const newItinerary = await trip_locationModel.findAll({
+      where: {
+        tripID: tripId,
+      },
+      order: [
+        ['id', 'ASC'],
+      ],
+      attributes: [
+        'id', 'tripID', 'day'
+      ],
+      include: [
+        // {
+        //   model: locationModel,
+        //   on: sequelize.literal('location.id = trip_location.locationID'),
+        //   attributes: ['name'],
+        //   required: true,
+        // },
+        {
+          model: activityModel,
+          on: sequelize.literal('activity.id = trip_location.activity_id'),
+          attributes: ['activity_name'],
+          required: true,
+        }
+      ]
+    })
+
+    res.status(200).send({
+      newItinerary: newItinerary
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//put - updating an itinerary '/itinerary/:tripId/:id'
+async function updateItinerary (req, res) {
+  try {
+    const {
+      tripId,
+      id
+    } = req.params;
+    let {
+      day,
+      location,
+      activity
+    } = req.body;
+
+    const locationData = await getLocationByName(location);
+    const locationId = locationData.id;
+
+    const activityData = await getActivityByName(activity);
+    const activityId = activityData.id;
+
+    const updatedItinerary = await trip_locationModel.update({
+      tripID: tripId,
+      day: day,
+      locationID: locationId,
+      activity_id: activityId,
+    }, {
+      where: {
+        id: id,
+      }
+    });
+    if (updatedItinerary[0] === 0) {
+      res.status(404).send({
+        message: "Itinerary not found"
+      })
+    } else {
+      res.status(201).send({
+        message: "Itinerary updated successfully",
+        itinerary: tripId,
+        day,
+        locationId,
+        activityId
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//delete - deleting an itinerary '/itinerary/:tripId/:id'
+async function deleteItinerary (req, res) {
+  const {
+    tripId,
+    id
+  } = req.params;
+
+  try {
+    const deleteItinerary = await trip_locationModel.destroy({
+      where: {
+        tripID: tripId,
+        id: id
+      }
+    })
+    if (deleteItineraryItinerary[0] === 0) {
+      res.status(404).send({
+        message: "Itinerary not found"
+      })
+    } else {
+      res.status(200).send({
+        message: "Itinerary deleted successfully",
+        deleteItinerary: id
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
 module.exports = {
   getPublicTrips,
   getUserTrips,
@@ -301,5 +655,16 @@ module.exports = {
   createTrip,
   createBudget,
   getBudget,
-  updateBudget
-};
+  updateBudget,
+  insertLocation,
+  getLocation,
+  updateLocation,
+  deleteLocation,
+  insertActivity,
+  getActivity,
+  updateActivity,
+  createItinerary,
+  getItinerary,
+  updateItinerary,
+  deleteItinerary,
+  };

@@ -1,0 +1,9 @@
+PUT http://localhost:3000/trip/itinerary/1/1 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImVtYWlsIjoibHVxbWFuX2Z6QGVtYWlsLmNvbSIsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJpYXQiOjE2OTQ3OTAzOTIsImV4cCI6MTY5NDc5Mzk5Mn0.SJC5qXwzCZsFY3JwOH2_BP-44iTJ-CZ6SxH3ytm0o5Y
+
+{
+  "day": 1,
+  "location": "Hanthana",
+  "activity": "Hiking"
+}
