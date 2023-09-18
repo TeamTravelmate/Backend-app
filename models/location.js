@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasMany(models.activity, {
+        foreignKey: 'lodation_id'
+      })
+      this.hasMany(models.trip_location, {
+        foreignKey: 'locationID',
+      })
     }
   }
   location.init({

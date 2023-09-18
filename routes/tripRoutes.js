@@ -47,7 +47,7 @@ router.put('/activity/:id', validateUser, updateActivity);
 
 //routes related to itinerary
 router.get('/itinerary/:tripId', validateUser, getItinerary);
-router.post('/itinerary', validateUser, createItinerary);
+router.post('/itinerary/:tripId', validateUser, createItinerary);
 router.put('/itinerary/:tripId/:id', validateUser, updateItinerary);
 router.delete('/itinerary/:tripId/:id', validateUser, deleteItinerary);
 

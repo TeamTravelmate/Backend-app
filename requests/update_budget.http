@@ -19,6 +19,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZmlyc3ROY
       "expense_name": "Hotel fare",
       "amount": 5000,
       "category": "Accomodation"
+    },
+    {
+      "expense_name": "Park Tickets",
+      "amount": 5000,
+      "category": "Tickets"
     }
   ]
 }
