@@ -1,0 +1,14 @@
+POST http://localhost:3000/user/upgrade_to_tarvel_guide
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImZpcnN0TmFtZSI6IlRyaW5lZXNoYSIsImxhc3ROYW1lIjoiU2FuZHVuaSIsImVtYWlsIjoidHJpbmVlQGdtYWlsLmNvbSIsImlhdCI6MTY5NDg5ODkzOSwiZXhwIjoxNjk3NDkwOTM5fQ.Q3FKlOAU6coHUWrxx5IdxAljoRuvX7Yb8kG3BrkAoQE
+
+{
+  "nic": "996595234V",
+  "nic_copy": "efdfdf",
+  "SLTDA_License": "yfhhdjfnd",
+  "Language": "English",
+  "experience": "01 year",
+  "experience_field":"sdsfsfs",
+  "price_per_day": 10.00,
+  "status":0
+}

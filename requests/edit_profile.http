@@ -1,0 +1,10 @@
+PUT http://localhost:3000/user/edit_profile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImZpcnN0TmFtZSI6IlNld3dhbmRpIiwibGFzdE5hbWUiOiJXaWNrcmFtYXJhdGhuYSIsImVtYWlsIjoic2FjaGluaS51c2hhQGdtYWlsLmNvbSIsImlhdCI6MTY5NDg4NDM2OCwiZXhwIjoxNjk3NDc2MzY4fQ.3KWYnFL_OT1V_F6QoV_ThUxfe7IKlKqMnnU6lLCNtzA
+
+{
+    "firstName": "Buddi",
+    "lastName": "Yapa",
+    "userName": "Boo",
+    "phoneNo": "0775366383"
+}
