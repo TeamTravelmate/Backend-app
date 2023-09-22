@@ -7,6 +7,7 @@ const { sequelize } = require('./models');
 const { register, login } = require('./controller/authController');
 const TripController = require('./controller/tripController');
 const UserController = require('./controller/userController');
+const SearchController = require('./controller/searchController');
 
 const app = express();
 const port = 3000;
@@ -32,6 +33,7 @@ app.get('/', (req, res) => {
 
 app.use('/user', UserController);
 app.use('/trip', TripController);
+app.use('/search', SearchController);
 
 
 
