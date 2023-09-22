@@ -18,19 +18,30 @@ router.get('/', validateUser, async (req, res) => {
     const locations = await locationModel.findAll({
       where: { 
         city: { [Op.iLike]: `${userQuery}%` } 
-      }
+      },
+      attributes: ['name']
     })
 
     const activities = await activityModel.findAll({
       where: { 
         activity_name: { [Op.iLike]: `${userQuery}%` } 
-      }
+      },
+      attributes: ['activity_name'],
+      include: [
+        {
+          model: locationModel,
+          on: sequelize.literal('location.id = activity.lodation_id'),
+          attributes: ['name'],
+          // required: true,
+        }
+      ]
     })
 
     const users = await userModel.findAll({
       where: {
         firstName: { [Op.iLike]: `${userQuery}%` },
-      }
+      },
+      attributes: ['firstName', 'lastName', 'username']
       // where: {
       //   [sequelize.Op.or]: [
       //     { firstName: { [sequelize.Op.iLike]: `${userQuery}%` } },
