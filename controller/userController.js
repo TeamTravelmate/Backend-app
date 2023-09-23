@@ -1,7 +1,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {
-    User:userModel
+    User:userModel,
+    post: postModel,
+    sequelize
 } = require('../models');
 
 async function register (req, res, next) {
@@ -104,7 +106,328 @@ async function login (req, res, next) {
 }
 
 
+//view profile '$baseUrl/user/myProfile'
+async function myProfile (req, res) {
+    try {
+        const profile = await userModel.findOne({
+          where: {
+            email: req.user.email
+          },
+          attributes: [
+            'firstName', 'lastName', 'username'
+          ]
+        })
+        res.status(200).send(profile);
+      } catch (err) {
+        console.log(err);
+        res.status(500).send({
+          message: "Server error"
+        });
+      }
+}
+
+// add profile picture '$baseUrl/user/addProfilePic'
+
+//edit profile '$baseUrl/user/editProfile'
+async function editProfile(req, res) {
+    try {
+        let {
+          firstName,
+          lastName,
+          userName,
+          phoneNo
+        } = req.body;
+  
+        const user = await userModel.findOne({
+          where: {
+              email: req.user.email
+          }
+        });
+  
+        if (!user) {
+          return res.status(404).send({
+            message: 'User not found'
+          });
+        }
+  
+      user.firstName = firstName;
+      user.lastName = lastName;
+      user.username = userName;
+      user.phoneNo = phoneNo;
+  
+      await user.save();
+  
+      res.status(200).send({
+        message: 'Profile updated successfully',
+        user: user // Optionally, send back the updated user object
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({
+        message: 'Server error'
+      });
+    }
+}
+
+//update password '$baseUrl/user/updatePassword'
+async function updatePassword(req, res) {
+    try{
+        let {
+            newPassword,
+            confirmPassword
+        }=req.body;
+    
+
+    const user = await userModel.findOne({
+        where: {
+            email: req.user.email
+        }
+    });
+
+    if(!user){
+        return res.status(404).send({
+            message:'User not found'
+        });
+    }
+
+    if(newPassword !== confirmPassword){
+        return res.status(400).send({
+            message:'Passwords do not match'
+        });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password= hashedPassword;
+
+    await user.save();
+
+    res.status(200).send({
+        message: 'Password Update Successfully',
+        // user: user // Optionally, send back the updated user object
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({
+        message: 'Server error'
+      });
+    }
+}
+
+//upgrade as a tour guide '$baseUrl/user/upgradeGuide'
+
+//upgrade as a service provider '$baseUrl/user/upgradeServiceProvider'
+
+//upgrade as a vendor '$baseUrl/user/upgradevendor'
+
+//view my activities '$baseUrl/user/myActivities'
+
+// create post '$baseUrl/user/createPost'
+async function createPost(req, res) {
+    let {
+        content
+    } = req.body;
+
+    const userId = req.user.userId;
+
+    try {
+        const newPost = await postModel.create({
+            content: content,
+            shareCount: 0,
+            reactCount: 0,
+            commentCount: 0,
+            userID: userId
+        });
+        res.status(200).send({
+            message: "Post successfully added",
+            newPost: newPost
+        });
+            
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+          message: "Server error"
+        });
+    }
+}
+
+//get a specific post '$baseUrl/user/post/:postId'
+async function post(req, res) {
+    try {
+        const post = await postModel.findOne({
+            where: {
+                id: req.params.postId
+            },
+            attributes: [
+                'content', 'media', 'reactCount', 'commentCount', 'shareCount', 'createdAt'
+            ],
+            include: [
+                {
+                    model: userModel,
+                    attributes: ['firstName','lastName','username'],
+                    required: true,
+                }
+            ]
+        })
+
+        if (!post) {
+            res.status(404).send({
+                message: "Post not found"
+            });
+        }
+        else {
+            res.status(200).send(post);
+        }
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
+
+//get all the posts '$baseUrl/user/myPosts'
+async function myPosts(req, res) {
+    try {
+        const myPosts = await postModel.findAll({
+          where: {
+              userID: req.user.userId
+          },
+          order: [
+            ['createdAt', 'DESC']
+          ],
+          attributes: [
+            'content', 'media', 'reactCount', 'commentCount', 'shareCount', 'createdAt'
+          ],
+          include: [
+            {
+              model: userModel,
+            //   on: sequelize.literal('User.id = post.userID'),
+              attributes: ['firstName','lastName','username'],
+              required: true,
+            }
+          ]
+        })
+
+        if (!myPosts) {
+            res.status(404).send({
+                message: "No posts found"
+            });
+        } else {
+            res.status(200).send(myPosts);
+        }
+        
+      } catch (err) {
+        console.log(err);
+        res.status(500).send({
+          message: "Server error"
+        });
+      }
+}
+
+//get all the posts '$baseUrl/user/posts'
+async function posts(req, res) {
+    try {
+        const posts = await postModel.findAll({
+            order: [
+                ['createdAt', 'DESC']
+            ],
+            attributes: [
+                'content', 'media', 'reactCount', 'commentCount', 'shareCount', 'createdAt'
+            ],
+            include: [
+                {
+                    model: userModel,
+                    attributes: ['firstName','lastName','username'],
+                    required: true,
+                }
+            ]
+        })
+
+        if (!posts) {
+            res.status(404).send({
+                message: "No posts found"
+            });
+        } else {
+            res.status(200).send(posts);
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
+
+// add react count '$baseUrl/user/reactPost/:postId'
+async function reactPost(req, res) {
+    try {
+        const post = await postModel.findByPk(req.params.postId);
+
+        if (!post) {
+            res.status(404).send({
+                message: "Post not found"
+            });
+        } else {
+            post.reactCount += 1;
+            await post.save();
+            res.status(200).send({
+                message: "React added successfully",
+                post: post
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
+
+// add comment '$baseUrl/user/commentPost/:postId'
+// async function commentPost(req, res) {
+//     const {
+//         comment
+//     } = req.body;
+
+//     const userId = req.user.userId;
+
+//     try {
+//         const post = await postModel.findByPk(req.params.postId);
+
+//         if (!post) {
+//             res.status(404).send({
+//                 message: "Post not found"
+//             });
+//         } else {
+//             post.comment = comment;
+//             post.commentCount += 1;
+//             await post.save();
+//             res.status(200).send({
+//                 message: "Comment added successfully",
+//                 post: post
+//             });
+//         }
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).send({
+//             message: "Server error"
+//         });
+//     }
+// }
+
+// share post '$baseUrl/user/sharePost/:postId'
+
+
 module.exports = {
     register,
-    login
+    login,
+    myProfile,
+    editProfile,
+    updatePassword,
+    createPost,
+    post,
+    myPosts,
+    posts,
+    reactPost
 };
