@@ -7,6 +7,7 @@ const port = 3000;
 
 const tripRoutes = require('./routes/tripRoutes');
 const userRoutes = require('./routes/userRoutes');
+const searchRoutes = require('./routes/searchRoutes');
 
 app.use(bodyParser.json());
 sequelize
@@ -26,6 +27,7 @@ app.get('/', (req, res) => {
 
 app.use('/user', userRoutes);
 app.use('/trip', tripRoutes);
+app.use('/search', searchRoutes);
 
 
 
