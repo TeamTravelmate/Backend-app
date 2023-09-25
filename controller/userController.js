@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const {
     User:userModel,
     post: postModel,
+    react_post: react_postModel,
+    comment_post: comment_postModel,
     sequelize
 } = require('../models');
 
@@ -359,8 +361,11 @@ async function posts(req, res) {
     }
 }
 
-// add react count '$baseUrl/user/reactPost/:postId'
+// react & unreact post '$baseUrl/user/reactPost/:postId'
 async function reactPost(req, res) {
+    const userId = req.user.userId;
+    const postId = req.params.postId;
+
     try {
         const post = await postModel.findByPk(req.params.postId);
 
@@ -369,10 +374,120 @@ async function reactPost(req, res) {
                 message: "Post not found"
             });
         } else {
+            // check whether the user has already reacted to the post
+            const checkReact = await react_postModel.findOne({
+                where: {
+                    user_id: userId,
+                    post_id: postId
+                }
+            });
+
+            if (checkReact) {
+                // if user already reacted to the post already then clicks the icon again 
+                // 1. post it will be unreact
+                await react_postModel.destroy({
+                    where: {
+                        user_id: userId,
+                        post_id: postId
+                    }
+                });
+
+                // 2. react_count should be decreased by 1
+                post.reactCount -= 1;
+                await post.save();
+
+                res.status(400).send({
+                    message: "React removed successfully"
+                });    
+                return;
+            }
+
+            const react = await react_postModel.create({
+                user_id: userId,
+                post_id: postId
+            });
+
             post.reactCount += 1;
             await post.save();
+
             res.status(200).send({
                 message: "React added successfully",
+                post: post,
+                react: react
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
+
+// view reacts '$baseUrl/user/viewReacts/:postId'
+async function viewReacts(req, res) {
+    try {
+        const post = await postModel.findByPk(req.params.postId);
+
+        if (!post) {
+            res.status(404).send({
+                message: "Post not found"
+            });
+        } else {
+            const reacts = await react_postModel.findAll({
+                where: {
+                    post_id: req.params.postId
+                },
+                attributes: ['post_id'],
+                include: [
+                    {
+                        model: userModel,
+                        attributes: ['firstName','lastName'],
+                        required: true,
+                    }
+                ]
+            });
+
+            res.status(200).send({
+                message: "Reacts found successfully",
+                reacts: reacts
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
+
+// comment post '$baseUrl/user/commentPost/:postId'
+async function commentPost(req, res) {
+    const {
+        comment
+    } = req.body;
+
+    const userId = req.user.userId;
+
+    try {
+        const post = await postModel.findByPk(req.params.postId);
+
+        if (!post) {
+            res.status(404).send({
+                message: "Post not found"
+            });
+        } else {
+            const comment = await comment_postModel.create({
+                comment: req.body.comment,
+                user_id: userId,
+                post_id: req.params.postId
+            });
+
+            post.commentCount += 1;
+            await post.save();
+
+            res.status(200).send({
+                message: "Comment added successfully",
                 post: post
             });
         }
@@ -384,37 +499,42 @@ async function reactPost(req, res) {
     }
 }
 
-// add comment '$baseUrl/user/commentPost/:postId'
-// async function commentPost(req, res) {
-//     const {
-//         comment
-//     } = req.body;
+// view comments '$baseUrl/user/viewComments/:postId'
+async function viewComments(req, res) {
+    try {
+        const post = await postModel.findByPk(req.params.postId);
 
-//     const userId = req.user.userId;
+        if (!post) {
+            res.status(404).send({
+                message: "Post not found"
+            });
+        } else {
+            const comments = await comment_postModel.findAll({
+                where: {
+                    post_id: req.params.postId
+                },
+                attributes: ['comment'],
+                include: [
+                    {
+                        model: userModel,
+                        attributes: ['firstName','lastName'],
+                        required: true,
+                    }
+                ]
+            });
 
-//     try {
-//         const post = await postModel.findByPk(req.params.postId);
-
-//         if (!post) {
-//             res.status(404).send({
-//                 message: "Post not found"
-//             });
-//         } else {
-//             post.comment = comment;
-//             post.commentCount += 1;
-//             await post.save();
-//             res.status(200).send({
-//                 message: "Comment added successfully",
-//                 post: post
-//             });
-//         }
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).send({
-//             message: "Server error"
-//         });
-//     }
-// }
+            res.status(200).send({
+                message: "Comments found successfully",
+                comments: comments
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
 
 // share post '$baseUrl/user/sharePost/:postId'
 
@@ -429,5 +549,8 @@ module.exports = {
     post,
     myPosts,
     posts,
-    reactPost
+    reactPost,
+    viewReacts,
+    commentPost,
+    viewComments
 };

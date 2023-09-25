@@ -1,0 +1,7 @@
+PUT http://localhost:3000/user/commentPost/5 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJlbWFpbCI6Imx1cW1hbl9mekBnbWFpbC5jb20iLCJpYXQiOjE2OTU2NjM3MDksImV4cCI6MTY5ODI1NTcwOX0.9zYYiZb2YSWc3eqFqqLUGucnHd1LMeq3bKyG0iX5hRo
+Content-Type: application/json
+
+{
+    "comment": "I am glad you enjoyed your trip"
+}
