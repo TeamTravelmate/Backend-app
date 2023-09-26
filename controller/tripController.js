@@ -7,6 +7,7 @@ const {
   activity: activityModel,
   trip_location: trip_locationModel,
   tour_essential: tour_essentialModel,
+  trip_reminder: trip_reminderModel,
   sequelize
 } = require('../models');
 const {
@@ -775,6 +776,7 @@ async function updateEssential(req, res) {
     });
   }
 }
+
 //delete '/essential/:tripId/:id'
 async function deleteEssential(req, res) {
   const {
@@ -806,6 +808,148 @@ async function deleteEssential(req, res) {
   }
 }
 
+
+//***$baseurl/trip/reminder/:tripId***
+//post - inserting reminder '/reminder/:tripId'
+async function createReminder(req, res) {
+  const {
+    tripId
+  } = req.params;
+
+  let {
+    title,
+    date,
+    time
+  } = req.body;
+
+  const userId = req.user.userId;
+
+  try {
+    const newReminder = await trip_reminderModel.create({
+      trip_id: tripId,
+      title: title,
+      date: date,
+      time: time,
+      user_id: userId
+    })
+
+    res.status(201).send({
+      message: "Reminder addeded successfully",
+      reminder: newReminder
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//get - getting reminders '/reminder/:tripId'
+async function getReminder(req, res) {
+  const {
+    tripId
+  } = req.params;
+
+  try {
+    const reminders = await trip_reminderModel.findAll({
+      where: {
+        trip_id: tripId,
+      },
+      order: [
+        ['id', 'ASC'],
+      ],
+      attributes: ['title', 'date', 'time'],
+    });
+    if (reminders.length === 0) {
+      res.status(404).send({
+        message: "No reminders added"
+      })
+    }
+    res.status(200).send(reminders);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+//put - updating a reminder '/reminder/:tripId/:id'
+async function updateReminder(req,res) {
+  const {
+    tripId,
+    id
+  } = req.params;
+
+  let {
+    title,
+    date,
+    time
+  } = req.body;
+
+  try {
+    const updatedReminder = await trip_reminderModel.update({
+      title: title,
+      date: date,
+      time: time,
+    }, 
+    {
+      where: {
+        trip_id: tripId,
+        id: id,
+      }
+    });
+
+    if (updatedReminder[0] === 0) {
+      res.status(404).send({
+        message: "Reminder not found"
+      })
+    } else {
+      res.status(201).send({
+        message: "Reminder updated successfully"
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    })
+  }
+}
+
+//delete '/reminder/:tripId/:id'
+async function deleteReminder(req,res) {
+  const {
+    tripId,
+    id
+  } = req.params;
+
+  try {
+    const deleteReminder = await trip_reminderModel.destroy({
+      where: {
+        trip_id: tripId,
+        id: id
+      }
+    })
+    if (deleteReminder[0] === 0) {
+      res.status(404).send({
+        message: "Reminder not found"
+      })
+    } else {
+      res.status(200).send({
+        message: "Reminder deleted successfully"
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    })
+  }
+}
+
 module.exports = {
   getPublicTrips,
   getUserTrips,
@@ -830,5 +974,9 @@ module.exports = {
   getEssential,
   getEssentialByName,
   updateEssential,
-  deleteEssential
+  deleteEssential,
+  createReminder,
+  getReminder,
+  updateReminder,
+  deleteReminder
 };

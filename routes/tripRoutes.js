@@ -25,6 +25,10 @@ const {
   getEssentialByName,
   updateEssential,
   deleteEssential,
+  createReminder,
+  getReminder,
+  updateReminder,
+  deleteReminder
 } = require('../controller/tripController');
 
 // routes related to trips
@@ -62,4 +66,11 @@ router.get('/essential/:tripId/:essentialName', validateUser, getEssentialByName
 router.post('/essential/:tripId', validateUser, createEssential);
 router.put('/essential/:tripId/:id', validateUser, updateEssential);
 router.delete('/essential/:tripId/:id', validateUser, deleteEssential);
+
+//routes related to reminders
+router.post('/reminder/:tripId', validateUser, createReminder);
+router.get('/reminder/:tripId', validateUser, getReminder);
+router.put('/reminder/:tripId/:id', validateUser, updateReminder);
+router.delete('/reminder/:tripId/:id', validateUser, deleteReminder);
+
 module.exports = router;
