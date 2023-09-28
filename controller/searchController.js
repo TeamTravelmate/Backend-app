@@ -1,7 +1,8 @@
 const { 
     location : locationModel ,
     activity: activityModel,
-    User:userModel,
+    User: userModel,
+    vendor_essential: vendor_essentialModel,
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
@@ -56,6 +57,37 @@ async function search (req,res) {
           res.status(200).send({
             locations,
             activities,
+            users
+          });
+        }
+      } catch (err) { 
+        console.log(err);
+        res.status(500).send({
+          message: "Server error"
+        });
+      }
+}
+
+//get - search for users
+async function searchUsers (req,res) {
+    const {
+        userQuery
+      } = req.query;
+    
+      try {
+        const users = await userModel.findAll({
+          where: {
+            firstName: { [Op.iLike]: `${userQuery}%` },
+          },
+          attributes: ['firstName', 'lastName', 'username']
+        });
+    
+        if (!users) {
+          res.status(404).send({
+            message: "No results found"
+          });
+        } else {
+          res.status(200).send({
             users
           });
         }
@@ -130,8 +162,36 @@ async function searchActivities (req,res) {
     }
 }
 
+//get - products - search by product_name
+async function searchProducts (req, res) {
+    const {
+        assential_name
+    } = req.query;
+
+    try {
+        const products = await vendor_essentialModel.findAll({
+            where: { assential_name: { [Op.iLike]: `${assential_name}%` }  },
+            attributes: ['assential_name','price','quantity','seller_name','address']
+        })
+        if (!products) {
+            res.status(404).send({
+              message: "No products found"
+            });
+          } else {
+            res.status(200).send(products);
+          }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+        message: "Server error"
+      });
+    }
+}
+
 module.exports = {
     search,
+    searchUsers,
     searchLocations,
-    searchActivities
+    searchActivities,
+    searchProducts
 };
