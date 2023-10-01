@@ -114,16 +114,14 @@ async function addProduct(req, res){
 async function editProduct(req, res){
     let {
         price,
-        quantity,
-        address
+        quantity
     } = req.body;
 
     try{
         const productID = req.params.id;
         const product = await vendor_essentialModel.update({
                 price: price,
-                quantity: quantity,
-                address: address
+                quantity: quantity
             },{
                 where: {
                     id : productID
@@ -174,12 +172,6 @@ async function deleteProduct(req, res){
         });
     }
 }
-
-
-
-//*** Cart table 
-//*** (Columns: product_id,quantity(by default quantity is 1),total_amount,traveler_id,vendor_id) 
-//*** foreign keys:  product_id (vendor_essential table),traveler_id(User table),vendor_id(User table)
 
 //add to cart '$baseUrl/vendor/addToCart/:id'
 async function addToCart(req, res){
@@ -348,21 +340,13 @@ async function removeFromCart(req, res){
 
 //checkout '$baseUrl/vendor/checkout'
 
+//my orders - vendor '$baseUrl/vendor/myOrders'
+
 //clear cart items after checkout '$baseUrl/vendor/clearCart'
 
-//add payment method '$baseUrl/vendor/addPaymentMethod'
-
-//view my payment method '$baseUrl/vendor/myPaymentMethod'
-
-//edit payment method '$baseUrl/vendor/editPaymentMethod/:id'
-
-//add card details '$baseUrl/vendor/addCard'
-
-//view card details '$baseUrl/vendor/myCardDetails'
-
-//delete card details '$baseUrl/vendor/deleteCardDetails/:id'
-
 //add delivery method '$baseUrl/vendor/addDeliveryMethod'
+
+//delete delivery method '$baseUrl/vendor/deleteDeliveryMethod/:id'
 
 //add name, shipping address, phone number '$baseUrl/vendor/addShippingAddress'
 
@@ -372,13 +356,8 @@ async function removeFromCart(req, res){
 
 //view my shipping address '$baseUrl/vendor/myShippingAddress'
 
-//view my orders - delivered '$baseUrl/vendor/myOrders/delivered'
+//view my orders - traveller  '$baseUrl/vendor/myOrders/:user_id'
 
-//view my orders - processing '$baseUrl/vendor/myOrders/processing'
-
-//view my orders - cancelled '$baseUrl/vendor/myOrders/cancelled'
-
-//track order '$baseUrl/vendor/trackOrder/:id'
 
 
 
