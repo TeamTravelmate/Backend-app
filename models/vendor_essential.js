@@ -16,10 +16,24 @@ module.exports = (sequelize, DataTypes) => {
   vendor_essential.init({
     category: DataTypes.STRING,
     assential_name: DataTypes.STRING,
-    price: DataTypes.NUMERIC,
-    quantity: DataTypes.INTEGER,
-    seller_name: DataTypes.STRING,
-    address: DataTypes.STRING
+    price:{
+      type: DataTypes.NUMERIC,
+      allowNull: true
+    } ,
+    quantity:{
+      type: DataTypes.INTEGER,
+      allowNull: true
+    } ,
+    seller_name:{
+      type: DataTypes.STRING,
+      allowNull: true
+    } ,
+    address:{
+      type: DataTypes.STRING,
+      allowNull: true
+    } ,
+    user_id: DataTypes.INTEGER,
+    description: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'vendor_essential',
