@@ -56,6 +56,8 @@ async function myProducts(req, res) {
     }
 }
 
+//search my products by name '$baseUrl/vendor/searchMyProducts/:name'
+
 //get a product '$baseUrl/vendor/product/:id'
 async function getProduct(req, res) {
     try{
@@ -345,6 +347,8 @@ async function removeFromCart(req, res){
 //clear cart items after checkout '$baseUrl/vendor/clearCart'
 
 //add delivery method '$baseUrl/vendor/addDeliveryMethod'
+
+//view delivery method '$baseUrl/vendor/viewDeliveryMethod'
 
 //delete delivery method '$baseUrl/vendor/deleteDeliveryMethod/:id'
 
