@@ -1,6 +1,8 @@
+const { response } = require('express');
 const { capitalizeFirst } = require('../helpers/capitalizeFirstLetter');
 const{
     vendor_essential: vendor_essentialModel,
+    product_details: product_detailsModel,
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
@@ -9,8 +11,30 @@ const { Op } = require('sequelize');
 //give all sales products '$baseUrl/vendor/products'
 async function getAllProducts(req, res){
     try{
-        const products = await vendor_essentialModel.findAll({})
-        res.status(200).send(products);
+        const products = await product_detailsModel.findAll({
+            include: [{
+                model: vendor_essentialModel,
+                on: sequelize.literal('vendor_essential.id = product_details.vendor_essential_id'),
+                attributes: ['id','category','assential_name','user_id','description']
+            }],
+            attributes: ['id','price','quantity','colour','size']
+        })
+
+        // const product_details = products.map(product => {
+        //     return {
+        //         id: product.id,
+        //         price: product.price,
+        //         quantity: product.quantity,
+        //         colour: product.colour,
+        //         size: product.size,
+        //         // photo: product.photo,
+        //         vendor_essential_id: product.vendor_essential_id
+        //     }
+        // })
+
+        res.status(200).send({
+            products: products
+        });
     } catch (err){
         console.log(err);
         res.status(500).send({
@@ -28,7 +52,27 @@ async function getProductsByCategory(req, res){
                 category: { [Op.iLike]: `${category}%` }
             }
         })
-        res.status(200).send(products);
+
+        if (products.length === 0){
+            res.status(404).send({
+                message: "No products found"
+            })
+        }
+
+        const category_products = products.map(product => product.id);
+
+        const product_details = await product_detailsModel.findAll({
+            where: {
+                vendor_essential_id: category_products
+            },
+            include: [{
+                model: vendor_essentialModel,
+                on: sequelize.literal('vendor_essential.id = product_details.vendor_essential_id'),
+                attributes: ['assential_name','user_id','description']
+            }]
+        })
+
+        res.status(200).send(product_details);
     } catch (err){
         console.log(err);
         res.status(500).send({
@@ -40,14 +84,33 @@ async function getProductsByCategory(req, res){
 //give products by user '$baseUrl/vendor/myProducts'
 async function myProducts(req, res) {
     try{
-        const userID = req.params.userID;
+        const userID = req.user.userId;
         const products = await vendor_essentialModel.findAll({
             where: {
-                //add user_id to vendor_essential table
                 user_id : userID
             }
         })
-        res.status(200).send(products);
+
+        if (products.length === 0) {
+            response.status(404).send({
+                message: "No products found"
+            });
+        }
+
+        const my_products = products.map(product => product.id);
+
+        const product_details = await product_detailsModel.findAll({
+            where: {
+                vendor_essential_id: my_products
+            },
+            include: [{
+                model: vendor_essentialModel,
+                on: sequelize.literal('vendor_essential.id = product_details.vendor_essential_id'),
+                attributes: ['assential_name','description']
+            }]
+        })
+
+        res.status(200).send(product_details);
     } catch (err){
         console.log(err);
         res.status(500).send({
@@ -56,17 +119,22 @@ async function myProducts(req, res) {
     }
 }
 
-//search my products by name '$baseUrl/vendor/searchMyProducts/:name'
-
 //get a product '$baseUrl/vendor/product/:id'
 async function getProduct(req, res) {
     try{
         const productID = req.params.id;
-        const product = await vendor_essentialModel.findOne({
+        const product = await product_detailsModel.findOne({
             where: {
                 id : productID
-            }
+            },
+            include: [{
+                model: vendor_essentialModel,
+                on: sequelize.literal('vendor_essential.id = product_details.vendor_essential_id'),
+                attributes: ['assential_name','description']
+
+            }]
         })
+
         res.status(200).send(product);
     } catch (err){
         console.log(err);
@@ -78,33 +146,51 @@ async function getProduct(req, res) {
 
 //add a new product to the market place '$baseUrl/vendor/addProduct'
 async function addProduct(req, res){
-    try{
-        let{
+    try {
+        const {
             category,
-            name,
-            price,
-            quantity,
-            address
+            assential_name,
+            description,
+            product_details
         } = req.body;
-
-        const userID = req.user.userID;
-        const sellername = req.user.firstName + " " + req.user.lastName;
-
-        category = capitalizeFirst(category);
+        const userID = req.user.userId;
+        const new_product_details = [];
 
         const newProduct = await vendor_essentialModel.create({
             category: category,
-            assential_name: name,
+            assential_name: assential_name,
+            description: description,
+            user_id: userID
+        });
+
+        for (const details of product_details) {
+            let {
+                price,
+                quantity,
+                colour,
+                size
+                // photo
+            } = details;
+
+        const product_detail = await product_detailsModel.create({
             price: price,
             quantity: quantity,
-            seller_name: sellername,
-            address: address
+            colour: colour,
+            size: size,
+            // photo: photo,
+            vendor_essential_id: newProduct.id
         });
-        res.status(201).send({
-            message: "Product added successfully!",
-            vendor_essential: newProduct
-        });
-    } catch (err){
+
+        new_product_details.push(product_detail);
+    }
+         
+    res.status(201).send({
+        message: "Product added successfully!",
+        vendor_essential: newProduct,
+        product_details: new_product_details
+    });
+
+    } catch (err) {
         console.log(err);
         res.status(500).send({
             message: "Server Error!"
@@ -121,7 +207,7 @@ async function editProduct(req, res){
 
     try{
         const productID = req.params.id;
-        const product = await vendor_essentialModel.update({
+        const product = await product_detailsModel.update({
                 price: price,
                 quantity: quantity
             },{
@@ -151,7 +237,7 @@ async function editProduct(req, res){
 async function deleteProduct(req, res){
     try{
         const productID = req.params.id;
-        const product = await vendor_essentialModel.destroy({
+        const product = await product_detailsModel.destroy({
             where: {
                 id : productID
             }
@@ -174,6 +260,10 @@ async function deleteProduct(req, res){
         });
     }
 }
+
+
+
+
 
 //add to cart '$baseUrl/vendor/addToCart/:id'
 async function addToCart(req, res){
@@ -338,7 +428,7 @@ async function removeFromCart(req, res){
     }
 }
 
-
+//search my products by name '$baseUrl/vendor/myProducts/:name'
 
 //checkout '$baseUrl/vendor/checkout'
 

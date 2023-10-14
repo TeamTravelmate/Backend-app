@@ -12,7 +12,9 @@ const {
 
 router.get('/products', validateUser, getAllProducts);
 router.get('/category/:category', validateUser, getProductsByCategory);
+
 router.get('/myProducts', validateUser, myProducts);
+
 router.get('/product/:id', validateUser, getProduct);
 router.post('/addProduct', validateUser, addProduct);
 router.put('/editProduct/:id', validateUser, editProduct);
