@@ -3,6 +3,7 @@ const {
     activity: activityModel,
     User: userModel,
     vendor_essential: vendor_essentialModel,
+    product_details: product_detailsModel,
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
@@ -170,16 +171,29 @@ async function searchProducts (req, res) {
 
     try {
         const products = await vendor_essentialModel.findAll({
-            where: { assential_name: { [Op.iLike]: `${assential_name}%` }  },
-            attributes: ['assential_name','price','quantity','seller_name','address']
+            where: { assential_name: { [Op.iLike]: `${assential_name}%` }  }
         })
         if (!products) {
             res.status(404).send({
               message: "No products found"
             });
-          } else {
-            res.status(200).send(products);
           }
+
+          const getProduct = products.map(product => product.id);
+          const product_details = await product_detailsModel.findAll({
+            where: {
+              vendor_essential_id: getProduct
+            },
+            include: [{
+                model: vendor_essentialModel,
+                on: sequelize.literal('vendor_essential.id = product_details.vendor_essential_id'),
+                attributes: ['assential_name','description','user_id']
+            }],
+            order: [
+              ['id', 'DESC'],
+            ]
+          })
+        res.status(200).send(product_details);
     } catch (err) {
         console.log(err);
         res.status(500).send({
@@ -188,10 +202,56 @@ async function searchProducts (req, res) {
     }
 }
 
+
+
+//search - myProducts by name
+async function searchMyProducts (req, res) {
+  const user_ID = req.user.userId;
+  const {
+    assential_name
+  } = req.query;
+
+try {
+    const products = await vendor_essentialModel.findAll({
+        where: { 
+          user_id: user_ID,
+          assential_name: { [Op.iLike]: `${assential_name}%` }  
+        }
+    })
+    if (!products || products.length === 0) {
+        res.status(404).send({
+          message: "No products found"
+        });
+      }
+
+      const getProduct = products.map(product => product.id);
+      const product_details = await product_detailsModel.findAll({
+        where: {
+          vendor_essential_id: getProduct
+        },
+        include: [{
+            model: vendor_essentialModel,
+            on: sequelize.literal('vendor_essential.id = product_details.vendor_essential_id'),
+            attributes: ['assential_name','description']
+        }],
+        order: [
+          ['id', 'DESC'],
+        ]
+      })
+    res.status(200).send(product_details);
+} catch (err) {
+    console.log(err);
+    res.status(500).send({
+    message: "Server error"
+  });
+}
+}
+
 module.exports = {
     search,
     searchUsers,
     searchLocations,
     searchActivities,
-    searchProducts
+    searchProducts,
+    searchMyProducts
 };

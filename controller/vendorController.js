@@ -428,7 +428,7 @@ async function removeFromCart(req, res){
     }
 }
 
-//search my products by name '$baseUrl/vendor/myProducts/:name'
+
 
 //checkout '$baseUrl/vendor/checkout'
 
