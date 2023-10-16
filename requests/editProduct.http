@@ -1,4 +1,4 @@
-PUT http://localhost:3000/vendor/editProduct/4 HTTP/1.1
+PUT http://localhost:3000/vendor/editProduct/10 HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJlbWFpbCI6Imx1cW1hbl9mekBnbWFpbC5jb20iLCJpYXQiOjE2OTU0MDAyNDYsImV4cCI6MTY5Nzk5MjI0Nn0.N2Qw9Iu2w7MLX4DqTRLwCoYRsL0gZAIquX4I8lMn0Rk
 

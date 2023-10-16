@@ -3,6 +3,7 @@ const { capitalizeFirst } = require('../helpers/capitalizeFirstLetter');
 const{
     vendor_essential: vendor_essentialModel,
     product_details: product_detailsModel,
+    cart: cartModel,
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
@@ -217,11 +218,11 @@ async function editProduct(req, res){
             });
             if (product[0] === 0){
                 res.status(404).send({
-                    message: "Essential not found"
+                    message: "Product not found"
                 })
             } else {
                 res.status(200).send({
-                    message: "Essential updated successfully!",
+                    message: "Product updated successfully!",
                     product: product
                 });
             }
@@ -245,11 +246,11 @@ async function deleteProduct(req, res){
 
         if (product === 0) {
             res.status(404).send({
-                message: "Essential not found"
+                message: "Product not found"
             })
         } else {
             res.status(200).send({
-                message: "Essential deleted successfully!",
+                message: "Product deleted successfully!",
                 product: product
             });
         }
@@ -263,48 +264,52 @@ async function deleteProduct(req, res){
 
 
 
-
-
 //add to cart '$baseUrl/vendor/addToCart/:id'
 async function addToCart(req, res){
+    const productID = req.params.id;
+    const userID = req.user.userId;
+    let {
+        Quantity
+    } = req.body;
+
     try{
-        const productID = req.params.id;
-        const userID = req.user.userID;
-        const product = await vendor_essentialModel.findOne({
+        const product = await product_detailsModel.findOne({
             where: {
                 id : productID
             }
         })
 
-        //check product availability
-        if (product.quantity === 0){
-            res.status(404).send({
-                message: "Product not available!"
-            });
-        } else {
-            // 1. add product to cart 
-            const cart = await cartModel.create({
-                product_id: productID,
-                quantity: quantity, //1 by default
-                total_amount: product.price,
-                traveler_id: userID,
-                vendor_id: product.user_id
-            });
+            // check product availability
+            if (product.quantity < Quantity){
+                res.status(404).send({
+                    message: "Product not available!"
+                });
+            } else {
+                // 1. add product to cart 
+                const cart = await cartModel.create({
+                    product_id: productID,
+                    quantity: Quantity, 
+                    product_amount: product.price,
+                    traveler_id: userID,
+                    vendor_id: product.user_id
+                });
 
-            // 2. update quantity of product in vendor_essential table (quantity--)
-            const product = await vendor_essentialModel.update({
-                quantity: product.quantity - 1
-            },{
-                where: {
-                    id : productID
-                }
-            });
+                // 2. update quantity of product in product_details table 
+                const productToCart = await product_detailsModel.update({
+                    quantity: product.quantity - Quantity
+                },{
+                    where: {
+                        id : productID
+                    }
+                });
 
-        res.status(201).send({
-            message: "Product added to cart successfully!",
-            cart: cart
-        });
+            res.status(201).send({
+                message: "Product added to cart successfully!",
+                product: product,
+                cart: cart
+            });
     }
+        
     } catch (err){
         console.log(err);
         res.status(500).send({
@@ -315,20 +320,56 @@ async function addToCart(req, res){
 
 //view my cart '$baseUrl/vendor/myCart'
 async function myCart(req, res){
+    const userID = req.user.userId; 
+    const cart_items = []; 
+    const cart_product_details = []; 
+    const my_cart = [];
+
     try{
-        const userID = req.user.userID;
         const cart = await cartModel.findAll({
             where: {
                 traveler_id : userID
             },
-            include: [{
-                model: vendor_essentialModel,
-                as: 'vendor_essential',
-                attributes: ['assential_name', 'price', 'quantity', 'seller_name', 'address']
-            }]
+            attributes: ['id','quantity','product_amount','vendor_id','product_id']
         })
 
-        res.status(200).send(cart);
+        if (cart.length === 0){
+            res.status(404).send({
+                message: "Cart is empty!"
+            });
+        } else {
+            cart_items.push(cart);
+            
+            const cart_products = cart.map(product => product.product_id);
+
+            const products = await product_detailsModel.findAll({
+                where: {
+                    id: cart_products
+                },
+                as: 'product_details',
+                attributes: ['colour','size','photo'],
+                include: [{
+                    model: vendor_essentialModel,
+                    on: sequelize.literal('vendor_essential.id = product_details.vendor_essential_id'),
+                    attributes: ['assential_name','description']
+                }]
+            })
+            cart_product_details.push(products);
+
+            for (let i = 0; i < cart_items.length; i++) {
+                for (let j = 0; j < cart_product_details[i].length; j++) {
+                  const product = cart_items[i][j];
+                  const productDetails = cart_product_details[i][j];
+              
+                  my_cart.push({
+                    product,
+                    productDetails,
+                  });
+                }
+              }
+            //   console.log(my_cart);
+            res.status(200).send(my_cart);
+        }
     } catch (err){
         console.log(err);
         res.status(500).send({
@@ -337,47 +378,47 @@ async function myCart(req, res){
     }
 }
 
-//update quantity of the product in cart '$baseUrl/vendor/updateQuantityCart/:id'
-async function updateQuantityCart(req, res){
+//update quantity of the product in cart '$baseUrl/vendor/updateCart/:id'
+async function updateCart(req, res){
     try{
         const productID = req.params.id;
-        const userID = req.user.userID;
-        const quantity = req.body.quantity;
-        const product = await vendor_essentialModel.findOne({
+        const userID = req.user.userId;
+        let {
+            Quantity
+        } = req.body;
+
+        const product = await cartModel.findOne({
             where: {
-                id : productID
+                id : productID,
+                traveler_id : userID
             }
         })
 
+        const updateProduct = await product_detailsModel.findOne({
+            where: {
+                id : product.product_id
+            }
+        });
+
         //check product availability
-        if (product.quantity === 0){
+        if (updateProduct.quantity === 0 || updateProduct.quantity < Quantity){
             res.status(404).send({
                 message: "Product not available!"
             });
         } else {
-            // 1. update quantity of product in cart 
-            const cart = await cartModel.update({
-                quantity: quantity,
-                total_amount: product.price * quantity
-            },{
-                where: {
-                    product_id : productID,
-                    traveler_id : userID
-                }
-            });
+            // store the current quantity of product in cart
+            const quantity = product.quantity;
 
-            // 2. update quantity of product in vendor_essential table 
-            const product = await vendor_essentialModel.update({
-                quantity: product.quantity - quantity
-            },{
-                where: {
-                    id : productID
-                }
-            });
+            // 1. update quantity of product in cart 
+            product.quantity = Quantity;
+            await product.save();
+
+            // 2. update quantity of product in product_details table 
+            updateProduct.quantity = updateProduct.quantity - (Quantity - quantity);
+            await updateProduct.save();
 
         res.status(201).send({
-            message: "Product quantity updated successfully!",
-            cart: cart
+            message: "Product quantity updated successfully!"
         });
     }
     } catch (err){
@@ -392,32 +433,31 @@ async function updateQuantityCart(req, res){
 async function removeFromCart(req, res){
     try{
         const productID = req.params.id;
-        const userID = req.user.userID;
+        const userID = req.user.userId;
+
         const removeProduct = await cartModel.findOne({
             where: {
-                id : productID
+                id : productID,
+                traveler_id : userID
             }
         })
 
-        // 1. remove product from cart 
-        const cart = await cartModel.destroy({
+        const product = await product_detailsModel.findOne({
             where: {
-                product_id : productID,
-                traveler_id : userID
-            }
-        });
-        // 2. update quantity of product in vendor_essential table (accordding to the quantity in cart)
-        const product = await vendor_essentialModel.update({
-            quantity: product.quantity + removeProduct.quantity
-        },{
-            where: {
-                id : productID
+                id : removeProduct.product_id
             }
         });
 
+        // 1. remove product from cart 
+        await removeProduct.destroy();
+
+        // 2. update quantity of product in product_details table 
+        product.quantity = product.quantity + removeProduct.quantity;
+        await product.save();
+
         res.status(201).send({
             message: "Product removed from cart successfully!",
-            cart: cart
+            removedProduct: removeProduct
         });
         
     } catch (err){
@@ -516,5 +556,9 @@ module.exports = {
     getProduct,
     addProduct,
     editProduct,
-    deleteProduct
+    deleteProduct,
+    addToCart,
+    myCart,
+    updateCart,
+    removeFromCart
 }
