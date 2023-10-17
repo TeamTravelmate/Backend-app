@@ -8,6 +8,9 @@ const {
     addProduct,
     editProduct,
     deleteProduct,
+    addDeliveryMethod,
+    viewDeliveryMethod,
+    deleteDeliveryMethod,
     addToCart,
     myCart,
     updateCart,
@@ -23,6 +26,10 @@ router.get('/product/:id', validateUser, getProduct);
 router.post('/addProduct', validateUser, addProduct);
 router.put('/editProduct/:id', validateUser, editProduct);
 router.delete('/deleteProduct/:id', validateUser, deleteProduct);
+
+router.post('/addDeliveryMethod', validateUser, addDeliveryMethod);
+router.get('/viewDeliveryMethod', validateUser, viewDeliveryMethod);
+router.delete('/deleteDeliveryMethod/:id', validateUser, deleteDeliveryMethod);
 
 router.post('/addToCart/:id', validateUser, addToCart);
 router.get('/myCart',validateUser, myCart);

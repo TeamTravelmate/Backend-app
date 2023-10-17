@@ -4,6 +4,7 @@ const{
     vendor_essential: vendor_essentialModel,
     product_details: product_detailsModel,
     cart: cartModel,
+    delivery_method: delivery_methodModel,
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
@@ -262,7 +263,88 @@ async function deleteProduct(req, res){
     }
 }
 
+//add delivery method '$baseUrl/vendor/addDeliveryMethod'
+async function addDeliveryMethod(req, res){
+    const userID = req.user.userId;
+    const {
+        delivery_method
+    } = req.body;
 
+    try {
+        const delivery = await delivery_methodModel.create({
+            delivery_method: delivery_method,
+            user_id: userID
+        });
+
+        res.status(201).send({
+            message: "Delivery method added successfully!",
+            delivery_method: delivery
+        });
+
+    } catch (err) {
+        res.status(500).send({
+            message: "Server Error!"
+        })
+    }
+}
+
+//view delivery method '$baseUrl/vendor/viewDeliveryMethod'
+async function viewDeliveryMethod(req, res){
+    const userID = req.user.userId;
+
+    try{
+        const delivery = await delivery_methodModel.findAll({
+            where: {
+                user_id : userID
+            },
+            attributes: ['id','delivery_method']
+        })
+
+        if (delivery.length === 0){
+            res.status(404).send({
+                message: "No delivery method found!"
+            });
+        } else {
+            res.status(200).send(delivery);
+        }
+    } catch (err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
+
+//delete delivery method '$baseUrl/vendor/deleteDeliveryMethod/:id'
+async function deleteDeliveryMethod(req, res){
+    const deliveryID = req.params.id;
+    const userID = req.user.userId;
+
+    try {
+        const delivery = await delivery_methodModel.destroy({
+            where: {
+                id : deliveryID,
+                user_id : userID
+            }
+        })
+
+        if (delivery === 0){
+            res.status(404).send({
+                message: "Delivery method not found!"
+            });
+        } else {
+            res.status(200).send({
+                message: "Delivery method deleted successfully!",
+                delivery_method: delivery
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
 
 //add to cart '$baseUrl/vendor/addToCart/:id'
 async function addToCart(req, res){
@@ -476,12 +558,6 @@ async function removeFromCart(req, res){
 
 //clear cart items after checkout '$baseUrl/vendor/clearCart'
 
-//add delivery method '$baseUrl/vendor/addDeliveryMethod'
-
-//view delivery method '$baseUrl/vendor/viewDeliveryMethod'
-
-//delete delivery method '$baseUrl/vendor/deleteDeliveryMethod/:id'
-
 //add name, shipping address, phone number '$baseUrl/vendor/addShippingAddress'
 
 //edit name, shipping address, phone number '$baseUrl/vendor/editShippingAddress/:id'
@@ -557,6 +633,9 @@ module.exports = {
     addProduct,
     editProduct,
     deleteProduct,
+    addDeliveryMethod,
+    viewDeliveryMethod,
+    deleteDeliveryMethod,
     addToCart,
     myCart,
     updateCart,
