@@ -9,6 +9,7 @@ const tripRoutes = require('./routes/tripRoutes');
 const userRoutes = require('./routes/userRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const vendorRoutes = require('./routes/vendorRoutes');
+const followerRoutes = require('./routes/followerRoutes');
 
 app.use(bodyParser.json());
 sequelize
@@ -30,6 +31,7 @@ app.use('/user', userRoutes);
 app.use('/trip', tripRoutes);
 app.use('/search', searchRoutes);
 app.use('/vendor', vendorRoutes);
+app.use('/follower', followerRoutes);
 
 
 app.listen(port, () => {

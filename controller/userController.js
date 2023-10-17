@@ -130,6 +130,10 @@ async function myProfile (req, res) {
 
 // add profile picture '$baseUrl/user/addProfilePic'
 
+// get following count '$baseUrl/user/followingCount'
+
+// get followers count '$baseUrl/user/followersCount'
+
 //edit profile '$baseUrl/user/editProfile'
 async function editProfile(req, res) {
     try {
