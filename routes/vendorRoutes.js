@@ -14,7 +14,10 @@ const {
     addToCart,
     myCart,
     updateCart,
-    removeFromCart
+    removeFromCart,
+    addShippingDetails,
+    deleteShippingDetails,
+    myShippingDetails
 } =  require('../controller/vendorController');
 
 router.get('/products', validateUser, getAllProducts);
@@ -35,5 +38,9 @@ router.post('/addToCart/:id', validateUser, addToCart);
 router.get('/myCart',validateUser, myCart);
 router.put('/updateCart/:id', validateUser, updateCart);
 router.delete('/removeFromCart/:id', validateUser, removeFromCart);
+
+router.post('/addShippingDetails', validateUser, addShippingDetails);
+router.delete('/deleteShippingDetails/:id', validateUser, deleteShippingDetails);
+router.get('/myShippingDetails', validateUser, myShippingDetails);
 
 module.exports = router;

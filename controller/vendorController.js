@@ -5,6 +5,7 @@ const{
     product_details: product_detailsModel,
     cart: cartModel,
     delivery_method: delivery_methodModel,
+    shipping_details: shipping_detailsModel,
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
@@ -550,21 +551,109 @@ async function removeFromCart(req, res){
     }
 }
 
+//add name, shipping address, phone number '$baseUrl/vendor/addShippingAddress'
+async function addShippingDetails(req, res) {
+    const userID = req.user.userId;
+    const {
+        name,
+        phone_number,
+        house_number,
+        street,
+        city,
+        state,
+        country,
+        zip_code
+    } = req.body;
 
+    try {
+        const shipping = await shipping_detailsModel.create({
+            name: name,
+            phone_number: phone_number,
+            house_number: house_number,
+            street: street,
+            city: city,
+            state: state,
+            country: country,
+            zip_code: zip_code,
+            user_id: userID
+        });
+
+        res.status(201).send({
+            message: "Shipping details added successfully!",
+            shipping_details: shipping
+        });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        })
+    }
+}
+
+//delete name, shipping address, phone number '$baseUrl/vendor/deleteShippingAddress/:id'
+async function deleteShippingDetails(req, res){
+    const shippingID = req.params.id;
+    const userID = req.user.userId;
+
+    try {
+        const shipping = await shipping_detailsModel.destroy({
+            where: {
+                id : shippingID,
+                user_id : userID
+            }
+        })
+
+        if (!shipping){
+            res.status(404).send({
+                message: "Shipping details not found!"
+            });
+        } else {
+            res.status(200).send({
+                message: "Shipping details deleted successfully!",
+                shipping_details: shipping
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
+
+//view my shipping address '$baseUrl/vendor/myShippingAddress'
+async function myShippingDetails(req, res){
+    const userID = req.user.userId;
+
+    try{
+        const shipping = await shipping_detailsModel.findAll({
+            where: {
+                user_id : userID
+            },
+            attributes: ['name','phone_number','house_number','street','city','state','country','zip_code']
+        })
+
+        if (shipping.length === 0){
+            res.status(404).send({
+                message: "No shipping details found!"
+            });
+        } else {
+            res.status(200).send(shipping);
+        }
+    } catch (err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
 
 //checkout '$baseUrl/vendor/checkout'
 
 //my orders - vendor '$baseUrl/vendor/myOrders'
 
 //clear cart items after checkout '$baseUrl/vendor/clearCart'
-
-//add name, shipping address, phone number '$baseUrl/vendor/addShippingAddress'
-
-//edit name, shipping address, phone number '$baseUrl/vendor/editShippingAddress/:id'
-
-//delete name, shipping address, phone number '$baseUrl/vendor/deleteShippingAddress/:id'
-
-//view my shipping address '$baseUrl/vendor/myShippingAddress'
 
 //view my orders - traveller  '$baseUrl/vendor/myOrders/:user_id'
 
@@ -639,5 +728,8 @@ module.exports = {
     addToCart,
     myCart,
     updateCart,
-    removeFromCart
+    removeFromCart,
+    addShippingDetails,
+    deleteShippingDetails,
+    myShippingDetails
 }
