@@ -1,15 +1,21 @@
 const router = require('express').Router();
 const validateUser = require('../middleware/validateUser');
 const {
-    followUser,
-    unfollowUser,
+    followRequest,
+    acceptRequest,
+    rejectRequest,
+    unfollow,
     getFollowers,
-    getFollowing
+    getFollowings
 } = require('../controller/followerController');
 
-router.post('/follow/:id', validateUser, followUser);
-router.delete('/unfollow/:id', validateUser, unfollowUser);
-router.get('/followers/:id', validateUser, getFollowers);
-router.get('/following/:id', validateUser, getFollowing);
+router.post('/request/:id', validateUser, followRequest);
+router.post('/accept/:id', validateUser, acceptRequest);
+router.delete('/reject/:id', validateUser, rejectRequest);
+
+router.delete('/unfollow/:id', validateUser, unfollow);
+
+router.get('/followers', validateUser, getFollowers);
+router.get('/following', validateUser, getFollowings);
 
 module.exports = router;
