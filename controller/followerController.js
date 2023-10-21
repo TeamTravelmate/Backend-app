@@ -5,6 +5,8 @@ const {
     sequelize
 } = require('../models');
 
+const { Op } = require('sequelize');
+
 //***$baseUrl/follower***
 // follower request '$baseUrl/follower/request/:id'
 async function followRequest(req, res) {
@@ -146,7 +148,7 @@ async function unfollow(req, res){
     }
 }
 
-// get all followers of a user '$baseUrl/follower/followers/:id'
+// get all followers of a user '$baseUrl/follower/followers'
 async function getFollowers(req, res){
     const user_ID = req.user.userId;
 
@@ -187,7 +189,7 @@ async function getFollowers(req, res){
     }
 }
 
-// get all users a user is following '$baseUrl/follower/following/:id'
+// get all users a user is following '$baseUrl/follower/following'
 async function getFollowings(req, res){
     const user_ID = req.user.userId;
 
@@ -226,11 +228,57 @@ async function getFollowings(req, res){
     }
 }
 
+// get all friends of a user '$baseUrl/follower/friends'
+async function getFriends(req, res){
+    const user_ID = req.user.userId;
+
+    try {
+        const friends = await followerModel.findAll({
+            // get all following & followers of a user
+            where: {
+                [Op.or]: [{
+                    user_id: user_ID
+                }, {
+                    following_id: user_ID
+                }]
+            },
+            attributes: ['following_id']
+        });
+
+        if (friends.length === 0 || !friends) {
+            return res.status(200).json({
+                message: "You don't have any friends!"
+            });
+        }
+
+        const friendsArray = friends.map(friend => friend.following_id);
+
+        // get the details of the friends from user table
+        const friendsDetails = await UserModel.findAll({
+            where: {
+                id: friendsArray
+            },
+            attributes: ['firstName', 'lastName', 'username', 'email']
+        });
+
+        res.status(200).json({
+            friendsDetails
+        });
+
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            message: "Server error!"
+        })
+    }
+}
+
 module.exports = {
     followRequest,
     acceptRequest,
     rejectRequest,
     unfollow,
     getFollowers,
-    getFollowings
+    getFollowings,
+    getFriends
 };

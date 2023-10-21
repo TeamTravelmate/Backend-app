@@ -6,7 +6,8 @@ const {
     rejectRequest,
     unfollow,
     getFollowers,
-    getFollowings
+    getFollowings,
+    getFriends
 } = require('../controller/followerController');
 
 router.post('/request/:id', validateUser, followRequest);
@@ -17,5 +18,6 @@ router.delete('/unfollow/:id', validateUser, unfollow);
 
 router.get('/followers', validateUser, getFollowers);
 router.get('/following', validateUser, getFollowings);
+router.get('/friends', validateUser, getFriends);
 
 module.exports = router;
