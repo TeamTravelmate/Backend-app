@@ -411,11 +411,20 @@ async function reactPost(req, res) {
                 post_id: postId
             });
 
+            const user = await userModel.findOne({
+                where: {
+                    id: userId
+                },
+                attributes: ['firstName']
+            });
+
+            const reactnotification = user.firstName + " reacted to your post!";
+
             post.reactCount += 1;
             await post.save();
 
             res.status(200).send({
-                message: "React added successfully",
+                message: reactnotification,
                 post: post,
                 react: react
             });
@@ -467,10 +476,6 @@ async function viewReacts(req, res) {
 
 // comment post '$baseUrl/user/commentPost/:postId'
 async function commentPost(req, res) {
-    const {
-        comment
-    } = req.body;
-
     const userId = req.user.userId;
 
     try {
@@ -487,11 +492,20 @@ async function commentPost(req, res) {
                 post_id: req.params.postId
             });
 
+            const user = await userModel.findOne({
+                where: {
+                    id: userId
+                },
+                attributes: ['firstName']
+            });
+
+            const commentnotification = user.firstName + " commented on your post!";
+
             post.commentCount += 1;
             await post.save();
 
             res.status(200).send({
-                message: "Comment added successfully",
+                message: commentnotification,
                 post: post
             });
         }
