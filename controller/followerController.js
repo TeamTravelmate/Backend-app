@@ -20,8 +20,17 @@ async function followRequest(req, res) {
             time: sequelize.literal('CURRENT_TIMESTAMP')
         });
 
+        const sender = await UserModel.findOne({
+            where: {
+                id: user_ID
+            },
+            attributes: ['firstName']
+        });
+
+        const follownotification = sender.firstName + " requested to follow you!";
+
         res.status(200).json({
-            message: "Follow request sent!",
+            message: follownotification,
             followRequest
         });
 
