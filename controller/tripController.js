@@ -8,6 +8,7 @@ const {
   trip_location: trip_locationModel,
   tour_essential: tour_essentialModel,
   trip_reminder: trip_reminderModel,
+  reactTrip: reactTripModel,
   sequelize
 } = require('../models');
 const {
@@ -135,6 +136,43 @@ async function createTrip(req, res) {
     });
   }
 }
+
+// $baseUrl/trip/react/:tripId react a specific trip
+
+// $baseUrl/trip/upload/:tripId upload photos to a trip
+
+// $baseUrl/trip/invite/:tripId invite a user to a trip
+
+// $baseUrl/trip/accept/:tripId accept a trip invitation
+
+// $baseUrl/trip/reject/:tripId reject a trip invitation
+
+// $baseUrl/trip/leave/:tripId leave a trip
+
+
+//***$baseurl/trip/public/***
+// $baseUrl/trip/public create public trip details
+// set max_traveller_count, advance_amount, important_notes, hotels, vehicles, resturants
+
+// $baseUrl/trip/public/:tripId get public trip details
+// get max_traveller_count, advance_amount, important_notes, hotels, vehicles, resturants
+// get remaining_slots, guide details 
+
+// $baseUrl/trip/public PUT update public trip details
+// update traveller_count, advance_amount, important_notes, hotels, vehicles, resturants
+
+// $baseUrl/trip/pulic/join/:tripId join public trip 
+// 1. check if remaining_slots > 0
+// 2. insert into trip_user - deatils user_id, address, payment_status, trip_id
+// 3. update remaining_slots
+
+// $baseUrl/trip/public/pay pay for public trip
+// 1. check if payment_status is false
+// 2. insert payment details into trip_payment table
+// 3. update payment_status to true
+
+// $baseUrl/trip/tripmates/:tripId get tripmates of a trip 
+
 
 //***$baseurl/trip/budget/***
 //post - inserting/creating a budget
@@ -956,6 +994,7 @@ module.exports = {
   getTripFromId,
   updateTrip,
   createTrip,
+  reactTrip,
   createBudget,
   getBudget,
   updateBudget,
