@@ -5,6 +5,7 @@ const {
     post: postModel,
     react_post: react_postModel,
     comment_post: comment_postModel,
+    follower: followerModel,
     sequelize
 } = require('../models');
 
@@ -130,9 +131,36 @@ async function myProfile (req, res) {
 
 // add profile picture '$baseUrl/user/addProfilePic'
 
-// get following count '$baseUrl/user/followingCount'
+// get profile picture '$baseUrl/user/getProfilePic'
 
-// get followers count '$baseUrl/user/followersCount'
+// edit profile picture '$baseUrl/user/editProfilePic'
+
+// get following count '$baseUrl/user/followingCount'
+async function followingCount(req, res) {
+    try {
+        const followingCount = await followerModel.count({
+            where: {
+                following_id: req.user.userId
+            }
+        });
+
+        const followersCount = await followerModel.count({
+            where: {
+                user_id: req.user.userId
+            }
+        });
+
+        res.status(200).send({
+            followingCount: followingCount,
+            followersCount: followersCount
+        })
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 //edit profile '$baseUrl/user/editProfile'
 async function editProfile(req, res) {
@@ -224,6 +252,10 @@ async function updatePassword(req, res) {
 //upgrade as a service provider '$baseUrl/user/upgradeServiceProvider'
 
 //upgrade as a vendor '$baseUrl/user/upgradevendor'
+
+// get membership '$baseUrl/user/getMembership'
+
+// renew membership '$baseUrl/user/renewMembership'
 
 //view my activities '$baseUrl/user/myActivities'
 
@@ -561,6 +593,7 @@ module.exports = {
     register,
     login,
     myProfile,
+    followingCount,
     editProfile,
     updatePassword,
     createPost,

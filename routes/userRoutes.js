@@ -4,6 +4,7 @@ const {
     register,
     login,
     myProfile,
+    followingCount,
     editProfile,
     updatePassword,
     createPost,
@@ -20,6 +21,7 @@ router.post('/register', register);
 router.post('/login', login);
 
 router.get('/myProfile', validateUser, myProfile);
+router.get('/followingCount', validateUser, followingCount);
 router.put('/editProfile', validateUser, editProfile);
 router.put('/updatePassword', validateUser, updatePassword);
 

@@ -1002,7 +1002,6 @@ module.exports = {
   getTripFromId,
   updateTrip,
   createTrip,
-  reactTrip,
   createBudget,
   getBudget,
   updateBudget,
