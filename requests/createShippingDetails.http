@@ -1,0 +1,14 @@
+POST http://localhost:3000/vendor/addShippingDetails HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJlbWFpbCI6Imx1cW1hbl9mekBnbWFpbC5jb20iLCJpYXQiOjE2OTc1NDM5MjMsImV4cCI6MTcwMDEzNTkyM30.B8qdvO8k_UF4Vf0wScp9Fmq2hq-vkkgll88rx_EGeHI
+
+{
+    "name": "Lakshitha Fernando",
+    "phone_number": "0712345678",
+    "house_number": "12",
+    "street": "Kandy Road",
+    "city": "Kurunegala",
+    "state": "North Western",
+    "country": "Sri Lanka",
+    "zip_code": "60000"
+}

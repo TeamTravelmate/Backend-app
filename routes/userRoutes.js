@@ -11,6 +11,9 @@ const {
     myPosts,
     posts,
     reactPost,
+    viewReacts,
+    commentPost,
+    viewComments,
 } =  require('../controller/userController');
 
 router.post('/register', register);
@@ -25,6 +28,9 @@ router.get('/post/:postId', validateUser, post);
 router.get('/myPosts', validateUser, myPosts);
 router.get('/posts', validateUser, posts);
 router.put('/reactPost/:postId', validateUser, reactPost);
+router.get('/viewReacts/:postId', validateUser, viewReacts);
+router.put('/commentPost/:postId', validateUser, commentPost);
+router.get('/viewComments/:postId', validateUser, viewComments);
 
 
 module.exports = router;

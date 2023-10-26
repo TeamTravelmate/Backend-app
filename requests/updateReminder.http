@@ -1,8 +1,9 @@
-POST http://localhost:3000/trip/location HTTP/1.1
+PUT http://localhost:3000/trip/reminder/2/1 HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJlbWFpbCI6Imx1cW1hbl9mekBnbWFpbC5jb20iLCJpYXQiOjE2OTQ4NjkxNzMsImV4cCI6MTY5NzQ2MTE3M30.MsSmNs5j2IOkvHZCPIV0MCbR1EElJXhzPOBO7J4fDsY
 
 {
-    "name": "Weligama",
-    "city": "Matara"
+    "title" : "Keep atleast 1l water",
+    "date" : "2023-10-10",
+    "time" : "08:00:00"
 }
