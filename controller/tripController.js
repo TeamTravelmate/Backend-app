@@ -8,7 +8,7 @@ const {
   trip_location: trip_locationModel,
   tour_essential: tour_essentialModel,
   trip_reminder: trip_reminderModel,
-  reactTrip: reactTripModel,
+  react_trip: reactTripModel,
   sequelize
 } = require('../models');
 const {
@@ -146,6 +146,52 @@ async function createTrip(req, res) {
 }
 
 // $baseUrl/trip/react/:tripId react a specific trip
+async function reactTrip(req, res){
+  try {
+    const tripId = req.params.tripId;
+    const userId = req.user.userId;
+
+    const trip = await tripModel.findByPk(tripId);
+    if (trip === null) {
+      res.status(404).send({
+        message: "Trip not found"
+      });
+    } else {
+      // check if user has already reacted
+      const reaction = await reactTripModel.findOne({
+        where: {
+          trip_id: tripId,
+          user_id: userId
+        }
+      });
+      if (reaction !== null) {
+        // remove reaction / unreact
+        const unreact = await reactTripModel.destroy({
+          where: {
+            trip_id: tripId,
+            user_id: userId
+          }
+        });
+      } else {
+        const newReaction = await reactTripModel.create({
+          trip_id: tripId,
+          user_id: userId
+        });
+    
+        res.status(201).send({
+          message: "Reaction added successfully",
+          reaction: newReaction
+        });
+      }
+    }
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
 
 // $baseUrl/trip/upload/:tripId upload photos to a trip
 
@@ -1002,6 +1048,7 @@ module.exports = {
   getTripFromId,
   updateTrip,
   createTrip,
+  reactTrip,
   createBudget,
   getBudget,
   updateBudget,

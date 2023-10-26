@@ -6,6 +6,7 @@ const {
   getTripFromId,
   updateTrip,
   createTrip,
+  reactTrip,
   createBudget,
   getBudget,
   updateBudget,
@@ -37,6 +38,7 @@ router.get('/myTrips', validateUser, getUserTrips);
 router.get('/:tripId', getTripFromId);
 router.post('/', validateUser, createTrip);
 router.put('/', validateUser, updateTrip);
+router.put('/react/:tripId', validateUser, reactTrip);
 
 //routes related to budget
 router.get('/budget/:tripId', getBudget);
