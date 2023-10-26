@@ -126,7 +126,15 @@ async function createTrip(req, res) {
     });
     res.status(201).send({
       message: "Trip created successfully",
-      trip: newTrip
+      trip: {
+        id: newTrip.id,
+        starting_date: new Date(newTrip.starting_date).toLocaleDateString(),
+        category: newTrip.category,
+        numberOfDays: newTrip.no_of_days,
+        startingPlace: newTrip.starting_place,
+        user_id: newTrip.user_id
+      
+      }
     });
     // console.log(newTrip);
   } catch (err) {
