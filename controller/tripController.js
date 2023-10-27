@@ -9,6 +9,8 @@ const {
   tour_essential: tour_essentialModel,
   trip_reminder: trip_reminderModel,
   react_trip: reactTripModel,
+  public_trip: publicTripModel,
+  User: userModel,
   sequelize
 } = require('../models');
 const {
@@ -205,15 +207,150 @@ async function reactTrip(req, res){
 
 
 //***$baseurl/trip/public/***
-// $baseUrl/trip/public create public trip details
-// set max_traveller_count, advance_amount, important_notes, hotels, vehicles, resturants
+// $baseUrl/trip/public/:tripId create public trip details
+async function publicTripDetails(req, res) {
+  const tripId = req.params.tripId;
+
+  let {
+    max_traveler_count,
+    amount_per_head,
+    important_notes,
+    hotels,
+    resturants,
+    transport
+  } = req.body;
+
+  try {
+    const trip = await tripModel.findByPk(tripId);
+
+    if (!trip) {
+      res.status(404).send({
+        message: "Trip not found"
+      });
+    } else {
+      const tripDetails = await publicTripModel.create({
+        trip_id: tripId,
+        max_traveler_count: max_traveler_count,
+        remaining_slots: max_traveler_count,
+        amount_per_head: amount_per_head,
+        important_notes: important_notes,
+        hotels: hotels,
+        resturants: resturants,
+        transport: transport
+      });
+
+      res.status(201).send({
+        message: "Public trip details added successfully",
+        tripDetails: tripDetails
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
 
 // $baseUrl/trip/public/:tripId get public trip details
-// get max_traveller_count, advance_amount, important_notes, hotels, vehicles, resturants
-// get remaining_slots, guide details 
+async function getPublicTripDetails(req, res) {
 
-// $baseUrl/trip/public PUT update public trip details
-// update traveller_count, advance_amount, important_notes, hotels, vehicles, resturants
+  try {
+    const tripId = req.params.tripId;
+
+    const trip = await tripModel.findByPk(tripId);
+    if (!trip) {
+      res.status(404).send({
+        message: "Trip not found"
+      });
+    }
+
+    const tripDetails = await publicTripModel.findOne({
+      where: {
+        trip_id: tripId
+      },
+      attributes: [
+        'remaining_slots', 'amount_per_head', 'important_notes', 'hotels', 'resturants', 'transport'
+      ]
+    });
+
+    const tripGuideDetails = await tripModel.findOne({
+      where: {
+        id: tripId
+      },
+      attributes: [
+        'user_id'
+      ],
+      include: [{
+        model: userModel,
+        attributes: ['firstName', 'lastName', 'phoneNo']
+      }]
+    });
+
+    const tripGuide = tripGuideDetails.User.firstName + " " + tripGuideDetails.User.lastName;
+    const tripGuideContact = tripGuideDetails.User.phoneNo;
+    
+    res.status(200).send({
+      tripDetails: tripDetails,
+      tripGuide: tripGuide, 
+      tripGuideContact: tripGuideContact
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+// $baseUrl/trip/public/:tripId PUT update public trip details
+async function updatePublicTripDetails(req, res) {
+  const tripId = req.params.tripId;
+
+  let {
+    remaining_slots,
+    amount_per_head,
+    important_notes,
+    hotels,
+    resturants,
+    transport
+  } = req.body;
+
+  try {
+    const trip = await tripModel.findByPk(tripId);
+
+    if (!trip) {
+      res.status(404).send({
+        message: "Trip not found"
+      });
+    } else {
+      const tripDetails = await publicTripModel.update({
+        remaining_slots: remaining_slots,
+        amount_per_head: amount_per_head,
+        important_notes: important_notes,
+        hotels: hotels,
+        resturants: resturants,
+        transport: transport
+      }, {
+        where: {
+          trip_id: tripId
+        }
+      });
+
+      res.status(201).send({
+        message: "Public trip details updated successfully",
+        tripDetails: tripDetails
+      });
+    }
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
 
 // $baseUrl/trip/pulic/join/:tripId join public trip 
 // 1. check if remaining_slots > 0
@@ -1049,6 +1186,9 @@ module.exports = {
   updateTrip,
   createTrip,
   reactTrip,
+  publicTripDetails,
+  getPublicTripDetails,
+  updatePublicTripDetails,
   createBudget,
   getBudget,
   updateBudget,

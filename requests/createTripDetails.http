@@ -1,0 +1,12 @@
+POST http://localhost:3000/trip/public/5 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJlbWFpbCI6Imx1cW1hbl9mekBnbWFpbC5jb20iLCJpYXQiOjE2OTgzNDA3MDksImV4cCI6MTcwMDkzMjcwOX0.qxjik7OtDP48l_D-pefs3FSbcXlcOSiiH0xus5Q5EaI
+
+{
+    "max_traveler_count": 25,
+    "amount_per_head": 7000.00,
+    "important_notes": "Get caps with you and also some warm clothes",
+    "hotels": "2 nights at Galle, 1 night at Yala, 1 night at Hikkaduwa",
+    "resturants": "Veg and Non-Veg food",
+    "transport": "Train and Bus"
+}

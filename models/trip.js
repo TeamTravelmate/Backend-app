@@ -13,7 +13,10 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.hasOne(models.budget, {
         foreignKey: 'tripID',
-      });
+      })
+      this.belongsTo(models.User, {
+        foreignKey: 'user_id'
+      })
     }
   }
   trip.init({
