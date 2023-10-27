@@ -2,12 +2,12 @@ POST http://localhost:3000/user/register
 Content-Type: application/json
 
 {
-  "username": "thotSlayer",
-  "email": "luqman_fz@gmail.com",
-  "password": "abc123",
-  "firstName": "Luqman",
-  "lastName": "Fazal",
+  "username": "amashi",
+  "email": "amashi@gmail.com",
+  "password": "ama",
+  "firstName": "Amashi",
+  "lastName": "Sanduni",
   "birthday": "2000-05-29",
-  "gender": "Male",
-  "phoneNo": "0767716157"
+  "gender": "Female",
+  "phoneNo": "1129623584"
 }
