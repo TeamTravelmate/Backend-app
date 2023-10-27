@@ -9,10 +9,19 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      tripID: {
+      trip_id: {
         type: Sequelize.INTEGER
       },
-      userID: {
+      user_id: {
+        type: Sequelize.INTEGER
+      },
+      address: {
+        type: Sequelize.STRING
+      },
+      payment_status: {
+        type: Sequelize.STRING
+      },
+      no_of_travelers: {
         type: Sequelize.INTEGER
       },
       createdAt: {
