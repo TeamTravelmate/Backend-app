@@ -357,14 +357,6 @@ async function updatePublicTripDetails(req, res) {
 async function joinPublicTrip(req, res) {
   try {
     const tripId = req.params.tripId;
-
-    // if (!req.user || !req.user.userId) {
-    //   res.status(401).send({
-    //     message: "Unauthorized"
-    //   });
-    //   return;
-    // }
-
     const userId = req.user.userId;
 
     let {
@@ -375,7 +367,7 @@ async function joinPublicTrip(req, res) {
     // 1. check if remaining_slots > no_of_travelers
     const tripDetails = await publicTripModel.findOne({
       where: {
-        trip_id: req.params.tripId
+        trip_id: tripId
       },
       attributes: [
         'remaining_slots', 'amount_per_head'
@@ -427,7 +419,39 @@ async function joinPublicTrip(req, res) {
 // 3. update payment_status to true
 
 // $baseUrl/trip/tripmates/:tripId get tripmates of a trip 
+async function getTripMates(req, res) {
+  try {
+    const tripId = req.params.tripId;
 
+    const trip = await tripModel.findByPk(tripId);
+    if (!trip) {
+      res.status(404).send({
+        message: "Trip not found"
+      });
+    }
+
+    const tripMates = await trip_userModel.findAll({
+      where: {
+        trip_id: tripId
+      },
+      attributes: [
+        'user_id'
+      ],
+      include: [{
+        model: userModel,
+        attributes: ['firstName', 'lastName', 'username']
+      }]
+    });
+
+    res.status(200).send(tripMates);
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
 
 //***$baseurl/trip/budget/***
 //post - inserting/creating a budget
@@ -1254,6 +1278,7 @@ module.exports = {
   getPublicTripDetails,
   updatePublicTripDetails,
   joinPublicTrip,
+  getTripMates,
   createBudget,
   getBudget,
   updateBudget,

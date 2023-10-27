@@ -11,6 +11,7 @@ const {
   getPublicTripDetails,
   updatePublicTripDetails,
   joinPublicTrip,
+  getTripMates,
   createBudget,
   getBudget,
   updateBudget,
@@ -48,7 +49,8 @@ router.put('/react/:tripId', validateUser, reactTrip);
 router.post('/public/:tripId', publicTripDetails);
 router.get('/public/:tripId', getPublicTripDetails);
 router.put('/public/:tripId', updatePublicTripDetails);
-router.post('/public/join/:tripId', joinPublicTrip);
+router.post('/public/join/:tripId', validateUser, joinPublicTrip);
+router.get('/public/mates/:tripId', getTripMates);
 
 //routes related to budget
 router.get('/budget/:tripId', getBudget);
