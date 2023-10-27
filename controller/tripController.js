@@ -11,6 +11,7 @@ const {
   react_trip: reactTripModel,
   public_trip: publicTripModel,
   User: userModel,
+  trip_user: trip_userModel,
   sequelize
 } = require('../models');
 const {
@@ -353,9 +354,72 @@ async function updatePublicTripDetails(req, res) {
 }
 
 // $baseUrl/trip/pulic/join/:tripId join public trip 
-// 1. check if remaining_slots > 0
-// 2. insert into trip_user - deatils user_id, address, payment_status, trip_id
-// 3. update remaining_slots
+async function joinPublicTrip(req, res) {
+  try {
+    const tripId = req.params.tripId;
+
+    if (!req.user || !req.user.userId) {
+      res.status(401).send({
+        message: "Unauthorized"
+      });
+      return;
+    }
+
+    const userId = req.user.userId;
+
+    let {
+      no_of_travelers,
+      address
+    } = req.body;
+
+    // 1. check if remaining_slots > no_of_travelers
+    const tripDetails = await publicTripModel.findOne({
+      where: {
+        trip_id: req.params.tripId
+      },
+      attributes: [
+        'remaining_slots', 'amount_per_head'
+      ]
+    });
+
+    if (tripDetails.remaining_slots < no_of_travelers) {
+      res.status(400).send({
+        message: "Slots not available"
+      });
+    } else {
+
+      // 2. insert into trip_user table
+      const newTripUser = await trip_userModel.create({
+        user_id: userId,
+        address: address,
+        payment_status: false,
+        no_of_travelers: no_of_travelers,
+        trip_id: tripId
+      });
+
+      // 3. update remaining_slots 
+      const remainingSlots = tripDetails.remaining_slots - no_of_travelers;
+      await publicTripModel.update({
+        remaining_slots: remainingSlots
+      }, {
+        where: {
+          trip_id: tripId
+        }
+      });
+
+      res.status(201).send({
+        message: "Joined public trip successfully",
+        newTripUser: newTripUser
+      });
+    }
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
 
 // $baseUrl/trip/public/pay pay for public trip
 // 1. check if payment_status is false
@@ -1189,6 +1253,7 @@ module.exports = {
   publicTripDetails,
   getPublicTripDetails,
   updatePublicTripDetails,
+  joinPublicTrip,
   createBudget,
   getBudget,
   updateBudget,

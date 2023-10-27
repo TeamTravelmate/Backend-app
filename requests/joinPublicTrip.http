@@ -1,0 +1,8 @@
+POST http://localhost:3000/trip/public/join/5 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImZpcnN0TmFtZSI6Ik5hem1hIiwibGFzdE5hbWUiOiJOYXphciIsImVtYWlsIjoibmF6bWFuYXphcjVAZ21haWwuY29tIiwiaWF0IjoxNjk4Mzg2NjA2LCJleHAiOjE3MDA5Nzg2MDZ9.4rJg5eKN9dL8uceqxJV2P_KuqVo114gwm6oFfnVYtXc
+
+{
+    "no_of_travelers": 2,
+    "address": "No. 1, Galaha Road, Peradeniya"
+}
