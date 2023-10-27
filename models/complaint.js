@@ -14,10 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   complaint.init({
+    user_id: DataTypes.INTEGER,
     title: DataTypes.STRING,
-    reason: DataTypes.STRING,
     category: DataTypes.STRING,
-    date: DataTypes.DATE
+    content_id: DataTypes.INTEGER,
+    status: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'complaint',

@@ -9,17 +9,20 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      title: {
-        type: Sequelize.STRING
+      user_id: {
+        type: Sequelize.INTEGER
       },
-      reason: {
+      title: {
         type: Sequelize.STRING
       },
       category: {
         type: Sequelize.STRING
       },
-      date: {
-        type: Sequelize.DATE
+      content_id: {
+        type: Sequelize.INTEGER
+      },
+      status: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

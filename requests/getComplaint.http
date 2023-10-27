@@ -1,0 +1,2 @@
+GET http://localhost:3000/user/viewComplaint/2 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJlbWFpbCI6Imx1cW1hbl9mekBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MjA1NTUsImV4cCI6MTcwMTAxMjU1NX0.kI-L_KiVGc3HCTCAev1A71LEOeS439F2ug-67TeSWik
