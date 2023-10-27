@@ -358,12 +358,12 @@ async function joinPublicTrip(req, res) {
   try {
     const tripId = req.params.tripId;
 
-    if (!req.user || !req.user.userId) {
-      res.status(401).send({
-        message: "Unauthorized"
-      });
-      return;
-    }
+    // if (!req.user || !req.user.userId) {
+    //   res.status(401).send({
+    //     message: "Unauthorized"
+    //   });
+    //   return;
+    // }
 
     const userId = req.user.userId;
 
