@@ -9,6 +9,7 @@ const {
     share_post: share_postModel,
     complaint: complaintModel,
     travel_guide: travel_guideModel,
+    service_provider: service_providerModel,
     sequelize
 } = require('../models');
 const crypto = require('crypto');
@@ -292,6 +293,48 @@ async function upgrade_guide(req, res) {
 };
 
 //upgrade as a service provider '$baseUrl/user/upgradeServiceProvider'
+async function upgrade_service_provider(req, res) {
+    try {
+      let {
+        nic,
+        nic_copy,
+        STLDA_license,
+        language,
+        no_of_experience,
+        experience_field,
+        price_per_hour,
+        address,
+        tel_no,
+        status
+      } = req.body;
+  
+      const userId = req.user.userId;
+
+      const newUpgrade = await service_providerModel.create({
+        nic: nic,
+        nic_copy: nic_copy,
+        STLDA_license: STLDA_license,
+        language: language,
+        no_of_year: no_of_experience,
+        field: experience_field,
+        price_per_hour: price_per_hour,
+        address: address,
+        tel_no: tel_no,
+        status: status,
+        user_id: userId,
+      });
+      res.status(201).send({
+        message: "Upgrade profile successfully",
+        upgrde: newUpgrade
+      });
+      console.log(newUpgrade);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({
+        message: "Server error"
+      });
+    }
+};
 
 //upgrade as a vendor '$baseUrl/user/upgradevendor'
 
@@ -728,5 +771,6 @@ module.exports = {
     viewComments,
     sharePost,
     complaint,
-    upgrade_guide
+    upgrade_guide,
+    upgrade_service_provider
 };

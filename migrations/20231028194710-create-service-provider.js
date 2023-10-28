@@ -9,23 +9,38 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      joined_date: {
-        type: Sequelize.DATE
+      nic: {
+        type: Sequelize.STRING
       },
       nic_copy: {
-        type: Sequelize.BLOB
-      },
-      type: {
         type: Sequelize.STRING
       },
-      license_id: {
+      STLDA_license: {
         type: Sequelize.STRING
       },
-      copy_of_license: {
-        type: Sequelize.BLOB
-      },
-      experience_category: {
+      language: {
         type: Sequelize.STRING
+      },
+      field: {
+        type: Sequelize.STRING
+      },
+      no_of_year: {
+        type: Sequelize.INTEGER
+      },
+      price_per_hour: {
+        type: Sequelize.FLOAT
+      },
+      address: {
+        type: Sequelize.STRING
+      },
+      tel_no: {
+        type: Sequelize.INTEGER
+      },
+      user_id: {
+        type: Sequelize.INTEGER
+      },
+      status: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

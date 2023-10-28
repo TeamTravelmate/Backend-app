@@ -1,0 +1,16 @@
+POST http://localhost:3000/user/upgrade_service_provider
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImZpcnN0TmFtZSI6IkFtYXNoaXdlIiwibGFzdE5hbWUiOiJTYW5kdW5pd2UiLCJlbWFpbCI6ImFtYXNoaXdlQGdtYWlsLmNvbSIsImlhdCI6MTY5ODQxMjg2MywiZXhwIjoxNzAxMDA0ODYzfQ.-_23ARLX7-h-nGCpEeGF7QeyS6TQFHo9yoVvpeyxOHE
+
+{
+  "nic": "996595234V",
+  "nic_copy": "efdfdf",
+  "STLDA_license": "yfhhdjfnd",
+  "language": "English",
+  "no_of_experience": 1,
+  "experience_field":"sdsfsfs",
+  "price_per_hour": 10.00,
+  "address": "Makola",
+  "tel_no": 5,
+  "status":0
+}

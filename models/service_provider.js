@@ -14,12 +14,20 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   service_provider.init({
-    joined_date: DataTypes.DATE,
-    nic_copy: DataTypes.BLOB,
-    type: DataTypes.STRING,
-    license_id: DataTypes.STRING,
-    copy_of_license: DataTypes.BLOB,
-    experience_category: DataTypes.STRING
+    nic: DataTypes.STRING,
+    nic_copy: DataTypes.STRING,
+    STLDA_license: DataTypes.STRING,
+    language: DataTypes.STRING,
+    field: DataTypes.STRING,
+    no_of_year: DataTypes.INTEGER,
+    price_per_hour: DataTypes.FLOAT,
+    address: DataTypes.STRING,
+    tel_no: DataTypes.INTEGER,
+    user_id: DataTypes.INTEGER,
+    status: {
+      type: DataTypes.INTEGER,
+      defaultValue:0
+    }
   }, {
     sequelize,
     modelName: 'service_provider',
