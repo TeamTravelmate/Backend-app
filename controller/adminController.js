@@ -804,6 +804,134 @@ async function orgComplaintsIgnored(req, res) {
     }
 }
 
+// view system complaints - pending '$baseUrl/admin/systemComplaintsPending'
+async function systemComplaintsPending(req, res) {
+    try {
+        // get all the complaints by category - system, pending
+        const systemComplaintsPending = await complaintModel.findAll({
+            where: {
+                category: "system",
+                status: "pending"
+            },
+            attributes: ['title','user_id']
+        });
+
+        // get the count of the complaints - system, pending
+        const systemPendingCount = await complaintModel.count({
+            where: {
+                category: "system",
+                status: "pending"
+            }
+        });
+
+        // if there are no complaints display a message 
+        if (systemComplaintsPending.length === 0) {
+            res.status(200).send({
+                message: "No pending complaints found",
+                count: systemPendingCount
+            });
+        } else {
+            res.status(200).send({
+                message: "Pending complaints found successfully",
+                count: systemPendingCount,
+                pending: systemComplaintsPending
+            });
+        }
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
+
+// view system complaints - resolved '$baseUrl/admin/systemComplaintsResolved'
+async function systemComplaintsResolved(req, res) {
+    try {
+                // get all the complaints by category - system, resolved
+                const systemComplaintsResolved = await complaintModel.findAll({
+                    where: {
+                        category: "system",
+                        status: "resolved"
+                    },
+                    attributes: ['title','user_id']
+                });
+        
+                // get the count of the complaints - system, resolved
+                const systemResolvedCount = await complaintModel.count({
+                    where: {
+                        category: "system",
+                        status: "resolved"
+                    }
+                });
+        
+                // if there are no complaints display a message
+                if (systemComplaintsResolved.length === 0) {
+                    res.status(200).send({
+                        message: "No resolved complaints found",
+                        count: systemResolvedCount
+                    });
+                } else {
+                    res.status(200).send({
+                        message: "Resolved complaints found successfully",
+                        count: systemResolvedCount,
+                        resolved: systemComplaintsResolved
+                    });
+                }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
+
+// view system complaints - ignored '$baseUrl/admin/systemComplaintsIgnored'
+async function systemComplaintsIgnored(req, res) {
+    try {
+                // get all the complaints by category - system, ignored
+                const systemComplaintsIgnored = await complaintModel.findAll({
+                    where: {
+                        category: "system",
+                        status: "ignored"
+                    },
+                    attributes: ['title','user_id']
+                });
+        
+                // get the count of the complaints - system, ignored
+                const systemIgnoredCount = await complaintModel.count({
+                    where: {
+                        category: "system",
+                        status: "ignored"
+                    }
+                });
+        
+                // if there are no complaints display a message
+                if (systemComplaintsIgnored.length === 0) {
+                    res.status(200).send({
+                        message: "No ignored complaints found",
+                        count: systemIgnoredCount
+                    });
+                } else {
+                    res.status(200).send({
+                        message: "Ignored complaints found successfully",
+                        count: systemIgnoredCount,
+                        ignored: systemComplaintsIgnored
+                    });
+                }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
+
+// ignore complaint '$baseUrl/admin/ignoreComplaint/:id'
+
+// take action on complaint '$baseUrl/admin/actionComplaint/:id'
+
 module.exports = {
     viewComplaint,
     postComplaintsPending,
@@ -817,5 +945,8 @@ module.exports = {
     userComplaintsIgnored,
     orgComplaintsPending,
     orgComplaintsResolved,
-    orgComplaintsIgnored
+    orgComplaintsIgnored,
+    systemComplaintsPending,
+    systemComplaintsResolved,
+    systemComplaintsIgnored
 };

@@ -14,6 +14,9 @@ const {
     orgComplaintsPending,
     orgComplaintsResolved,
     orgComplaintsIgnored,
+    systemComplaintsPending,
+    systemComplaintsResolved,
+    systemComplaintsIgnored,
 } =  require('../controller/adminController');
 
 // ***handle complaints***
@@ -39,5 +42,10 @@ router.get('/userComplaintsIgnored', validateUser, userComplaintsIgnored);
 router.get('/orgComplaintsPending', validateUser, orgComplaintsPending);
 router.get('/orgComplaintsResolved', validateUser, orgComplaintsResolved);
 router.get('/orgComplaintsIgnored', validateUser, orgComplaintsIgnored);
+
+// view system related complaints
+router.get('/systemComplaintsPending', validateUser, systemComplaintsPending);
+router.get('/systemComplaintsResolved', validateUser, systemComplaintsResolved);
+router.get('/systemComplaintsIgnored', validateUser, systemComplaintsIgnored);
 
 module.exports = router;
