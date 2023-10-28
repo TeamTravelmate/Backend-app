@@ -7,6 +7,7 @@ const {
   updateTrip,
   createTrip,
   reactTrip,
+  inviteUser,
   publicTripDetails,
   getPublicTripDetails,
   updatePublicTripDetails,
@@ -44,6 +45,7 @@ router.get('/:tripId', getTripFromId);
 router.post('/', validateUser, createTrip);
 router.put('/', validateUser, updateTrip);
 router.put('/react/:tripId', validateUser, reactTrip);
+router.post('/invite/:tripId', validateUser, inviteUser);
 
 //routes related to public trip details
 router.post('/public/:tripId', publicTripDetails);

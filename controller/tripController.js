@@ -12,6 +12,7 @@ const {
   public_trip: publicTripModel,
   User: userModel,
   trip_user: trip_userModel,
+  share_trip: shareTripModel,
   sequelize
 } = require('../models');
 const {
@@ -30,6 +31,7 @@ const {
 const {
   getActivityByName
 } = require('../helpers/getActivityByName');
+const crypto = require('crypto');
 
 // $baseUrl/trip gives all public trips
 async function getPublicTrips(req, res) {
@@ -199,13 +201,47 @@ async function reactTrip(req, res){
 // $baseUrl/trip/upload/:tripId upload photos to a trip
 
 // $baseUrl/trip/invite/:tripId invite a user to a trip
+async function inviteUser(req, res) {
+  try {
+      const tripId = req.params.tripId;
+      const userId = req.user.userId;
 
-// $baseUrl/trip/accept/:tripId accept a trip invitation
+      const trip = await tripModel.findByPk(tripId);
+      if (trip === null) {
+        res.status(404).send({
+          message: "Trip not found"
+        });
+        return;
+      } 
 
-// $baseUrl/trip/reject/:tripId reject a trip invitation
+      // Generate a cryptographically secure random string for the shareable link
+      function generateCryptographicallySecureRandomString() {
+        return crypto.randomBytes(32).toString('hex');
+      }
 
-// $baseUrl/trip/leave/:tripId leave a trip
+      const randomString = generateCryptographicallySecureRandomString();
 
+      // Create the shareable link
+      const shareableLink = `http://localhost:3000/trip/share/${randomString}`;
+
+      const newInvite = await shareTripModel.create({
+        trip_id: tripId,
+        user_id: userId,
+        link: shareableLink
+      });
+
+      res.status(201).send({
+        message: "User invited successfully",
+        invite: newInvite
+      });
+
+      } catch (err) {
+        console.log(err);
+        res.status(500).send({
+          message: "Server error"
+        });
+      }
+}
 
 //***$baseurl/trip/public/***
 // $baseUrl/trip/public/:tripId create public trip details
@@ -1274,6 +1310,7 @@ module.exports = {
   updateTrip,
   createTrip,
   reactTrip,
+  inviteUser,
   publicTripDetails,
   getPublicTripDetails,
   updatePublicTripDetails,
