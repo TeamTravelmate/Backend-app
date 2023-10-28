@@ -6,6 +6,7 @@ const{
     cart: cartModel,
     delivery_method: delivery_methodModel,
     shipping_details: shipping_detailsModel,
+    order: orderModel,
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
@@ -652,6 +653,27 @@ async function myShippingDetails(req, res){
 //checkout '$baseUrl/vendor/checkout'
 
 //my orders - vendor '$baseUrl/vendor/myOrders'
+async function getMyOrders(req, res){
+    try{
+        const orders = await orderModel.findAll({
+            where: {
+                user_id: userID
+            },
+            include: [{
+                model: cartModel,
+                on: sequelize.literal('cart.id = order.cart_id'),
+                attributes: ['id','quantity','product_amount']
+            }],
+            attributes: ['id,','user_id']
+        })
+        res.status(200).send(orders);
+    } catch(err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
 
 //clear cart items after checkout '$baseUrl/vendor/clearCart'
 
