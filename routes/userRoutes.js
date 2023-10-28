@@ -15,6 +15,7 @@ const {
     viewReacts,
     commentPost,
     viewComments,
+    sharePost,
     complaint,
     viewComplaint,
     postComplaintsPending,
@@ -47,6 +48,7 @@ router.put('/reactPost/:postId', validateUser, reactPost);
 router.get('/viewReacts/:postId', validateUser, viewReacts);
 router.put('/commentPost/:postId', validateUser, commentPost);
 router.get('/viewComments/:postId', validateUser, viewComments);
+router.put('/sharePost/:postId', validateUser, sharePost); 
 
 router.post('/fileComplaint/:id', validateUser, complaint);
 router.get('/viewComplaint/:id', validateUser, viewComplaint);

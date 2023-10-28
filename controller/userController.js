@@ -6,9 +6,11 @@ const {
     react_post: react_postModel,
     comment_post: comment_postModel,
     follower: followerModel,
+    share_post: share_postModel,
     complaint: complaintModel,
     sequelize
 } = require('../models');
+const crypto = require('crypto');
 
 async function register (req, res, next) {
     try {
@@ -587,8 +589,55 @@ async function viewComments(req, res) {
     }
 }
 
-// share post '$baseUrl/user/sharePost/:postId'
+// share post using link '$baseUrl/user/sharePost/:postId'
+async function sharePost(req, res) {
+    try {
+        const postId = req.params.postId;
+        const userId = req.user.userId;
+        
+        // check whether the post exists
+        const postToShare = await postModel.findByPk(postId);
+        if (!postToShare) {
+            res.status(404).send({
+                message: "Post not found"
+            });
+            return;
+        }
 
+        // Generate a cryptographically secure random string for the shareable link
+        function generateCryptographicallySecureRandomString() {
+            return crypto.randomBytes(32).toString('hex');
+        }
+  
+        const randomString = generateCryptographicallySecureRandomString();
+  
+        // Create the shareable link
+        const shareableLink = `http://localhost:3000/post/share/${randomString}`;
+
+        const sharePost = await share_postModel.create({
+            post_id: postId,
+            user_id: userId,
+            link: shareableLink
+        });
+        
+        // increase the share count by 1
+        const post = await postModel.findByPk(postId);
+        post.shareCount += 1;
+        await post.save();
+
+        res.status(200).send({
+            message: "Post shared successfully",
+            share: sharePost,
+            shareCount: post.shareCount
+        });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
 
 //*** Complaints ***
 // file complaint '$baseUrl/user/fileComplaint/:id'
@@ -1314,6 +1363,7 @@ module.exports = {
     viewReacts,
     commentPost,
     viewComments,
+    sharePost,
     complaint,
     viewComplaint,
     postComplaintsPending,
