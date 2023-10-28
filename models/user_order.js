@@ -17,10 +17,10 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.vendor_essential, {
         foreignKey : 'vendor_essential_id'
       })
-      this.belongsTo(models.user, {
+      this.belongsTo(models.User, {
         foreignKey : 'traveler_id'
       })
-      this.belongsTo(models.user, {
+      this.belongsTo(models.User, {
         foreignKey : 'vendor_id'
       })
     }
