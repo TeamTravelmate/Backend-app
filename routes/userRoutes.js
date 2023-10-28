@@ -17,6 +17,7 @@ const {
     viewComments,
     sharePost,
     complaint,
+    upgrade_guide
 } =  require('../controller/userController');
 
 router.post('/register', register);
@@ -38,5 +39,6 @@ router.get('/viewComments/:postId', validateUser, viewComments);
 router.put('/sharePost/:postId', validateUser, sharePost); 
 
 router.post('/fileComplaint/:id', validateUser, complaint);
+router.post('/upgrade_travelguide', validateUser, upgrade_guide);
 
 module.exports = router;

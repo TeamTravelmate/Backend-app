@@ -8,6 +8,7 @@ const {
     follower: followerModel,
     share_post: share_postModel,
     complaint: complaintModel,
+    travel_guide: travel_guideModel,
     sequelize
 } = require('../models');
 const crypto = require('crypto');
@@ -251,6 +252,44 @@ async function updatePassword(req, res) {
 }
 
 //upgrade as a tour guide '$baseUrl/user/upgradeGuide'
+async function upgrade_guide(req, res) {
+    try {
+      let {
+        nic,
+        nic_copy,
+        SLTDA_license,
+        language,
+        no_of_experience,
+        experience_field,
+        price_per_day,
+        status
+      } = req.body;
+  
+      const userId = req.user.userId;
+
+      const newUpgrade = await travel_guideModel.create({
+        nic: nic,
+        nic_copy: nic_copy,
+        SLTDA_license: SLTDA_license,
+        language: language,
+        no_of_experience: no_of_experience,
+        filed: experience_field,
+        price_per_day: price_per_day,
+        status: status,
+        user_id: userId,
+      });
+      res.status(201).send({
+        message: "Upgrade profile successfully",
+        upgrde: newUpgrade
+      });
+      console.log(newUpgrade);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({
+        message: "Server error"
+      });
+    }
+};
 
 //upgrade as a service provider '$baseUrl/user/upgradeServiceProvider'
 
@@ -689,4 +728,5 @@ module.exports = {
     viewComments,
     sharePost,
     complaint,
+    upgrade_guide
 };
