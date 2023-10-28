@@ -1,0 +1,11 @@
+POST http://localhost:3000/user/upgrade_vendor
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImZpcnN0TmFtZSI6IkFtYXNoaSIsImxhc3ROYW1lIjoiU2hpbiIsImVtYWlsIjoiYW1hc2hpQGdtYWlsLmNvbSIsImlhdCI6MTY5ODM5OTY1MCwiZXhwIjoxNzAwOTkxNjUwfQ.jf2KCdGcPCZkhBoF2X9H1YgGue8WBnPNj6BbVQgkCnk
+
+{
+  "address": "Kiribathgoda",
+  "business_reg_no": "CS5123",
+  "tel_no": 2,
+  "license_copy":"NOnono",
+  "status":0
+}

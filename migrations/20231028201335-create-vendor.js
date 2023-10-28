@@ -12,11 +12,20 @@ module.exports = {
       address: {
         type: Sequelize.STRING
       },
-      business_reg_no: {
+      bussiness_reg_no: {
         type: Sequelize.STRING
       },
       license_copy: {
-        type: Sequelize.BLOB
+        type: Sequelize.STRING
+      },
+      tel_no: {
+        type: Sequelize.INTEGER
+      },
+      user_id: {
+        type: Sequelize.INTEGER
+      },
+      status: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

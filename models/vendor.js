@@ -15,8 +15,14 @@ module.exports = (sequelize, DataTypes) => {
   }
   vendor.init({
     address: DataTypes.STRING,
-    business_reg_no: DataTypes.STRING,
-    license_copy: DataTypes.BLOB
+    bussiness_reg_no: DataTypes.STRING,
+    license_copy: DataTypes.STRING,
+    tel_no: DataTypes.INTEGER,
+    user_id: DataTypes.INTEGER,
+    status: {
+      type: DataTypes.INTEGER,
+      defaultValue:0
+    }
   }, {
     sequelize,
     modelName: 'vendor',

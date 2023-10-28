@@ -18,7 +18,8 @@ const {
     sharePost,
     complaint,
     upgrade_guide,
-    upgrade_service_provider
+    upgrade_service_provider,
+    upgrade_vendor
 } =  require('../controller/userController');
 
 router.post('/register', register);
@@ -42,5 +43,6 @@ router.put('/sharePost/:postId', validateUser, sharePost);
 router.post('/fileComplaint/:id', validateUser, complaint);
 router.post('/upgrade_travelguide', validateUser, upgrade_guide);
 router.post('/upgrade_service_provider', validateUser, upgrade_service_provider);
+router.post('/upgrade_vendor', validateUser, upgrade_vendor);
 
 module.exports = router;
