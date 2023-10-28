@@ -675,7 +675,33 @@ async function getMyOrders(req, res){
     }
 }
 
-//clear cart items after checkout '$baseUrl/vendor/clearCart'
+//clear cart items after checkout '$baseUrl/vendor/clearCart/:id'
+async function clearCart(req, res){
+    const userID = req.user.userId
+    try{
+        const cart = await cartModel.destroy({
+            where: {
+                user_id: userID
+            }
+        })
+        if(!cart) {
+            res.status(404).send({
+                message: "Cart details not found!"
+            });
+        }
+        else {
+            res.status(200).send({
+                message: "Cart cleared successfully!",
+                cart : cart
+            });
+        }
+    } catch(err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
 
 //view my orders - traveller  '$baseUrl/vendor/myOrders/:user_id'
 
