@@ -6,8 +6,7 @@ const {
     sequelize
 } = require('../models');
 
-// ***handle complaints***
-// ***view complaints***
+// *** handle complaints ***
 // view complaint '$baseUrl/admin/viewComplaint/:id'
 async function viewComplaint(req, res) {
     const complaintId = req.params.id;
@@ -929,8 +928,63 @@ async function systemComplaintsIgnored(req, res) {
 }
 
 // ignore complaint '$baseUrl/admin/ignoreComplaint/:id'
+async function ignore(req, res) {
+    const complaintId = req.params.id;
+    try {
+        const complaint = await complaintModel.findOne({
+            where: {
+                id: complaintId
+            }
+        });
+
+        if (!complaint) {
+            res.status(404).send({
+                message: "Complaint not found"
+            });
+        }
+        else {
+            await complaint.update({
+                status: "ignored"
+            });
+            res.status(200).send({
+                message: "Complaint ignored successfully"
+            });
+        }
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
 
 // take action on complaint '$baseUrl/admin/actionComplaint/:id'
+
+
+
+// *** User Management ***
+// view users '$baseUrl/admin/users'
+
+// disable user '$baseUrl/admin/disableUser/:id'
+
+// delete user '$baseUrl/admin/deleteUser/:id'
+
+// sort users by alphabetical order '$baseUrl/admin/users/sort'
+
+// sort users by number of posts '$baseUrl/admin/users/sort/posts'
+
+// sort users by number of comments '$baseUrl/admin/users/sort/comments'
+
+// sort users by number of complaints '$baseUrl/admin/users/sort/complaints'
+
+// sort users by number of trips '$baseUrl/admin/users/sort/trips'
+
+// filter users by role '$baseUrl/admin/users/filter/role'
+
+
+// *** Admin Panel ***
+
 
 module.exports = {
     viewComplaint,
@@ -948,5 +1002,6 @@ module.exports = {
     orgComplaintsIgnored,
     systemComplaintsPending,
     systemComplaintsResolved,
-    systemComplaintsIgnored
+    systemComplaintsIgnored,
+    ignore
 };
