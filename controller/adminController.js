@@ -4,6 +4,9 @@ const {
     post: postModel,
     comment_post: comment_postModel,
     complaint: complaintModel,
+    travel_guide: travel_guideModel,
+    service_provider: service_providerModel,
+    vendor: vendorModel,
     sequelize
 } = require('../models');
 
@@ -1078,7 +1081,55 @@ async function action(req, res) {
 
 
 // *** User Management ***
-// view users '$baseUrl/admin/users'
+// view users '$baseUrl/admin/viewUsers'
+async function viewUsers(req, res) {
+    const user = [];
+
+    try {
+        const users = await userModel.findAll({
+            attributes: ['id', 'firstName', 'lastName', 'email']
+        });
+
+        for (let i = 0; i < users.length; i++) {
+            // get user's name = firstName + lastName
+            users[i].name = users[i].firstName + " " + users[i].lastName;
+            console.log(users[i].name); 
+
+            // get account type 
+            switch (users[i].id) {
+                case travel_guideModel.user_id:
+                    var account_type = "travel guide";
+                    break;
+                case service_providerModel.user_id:
+                    var account_type = "service provider";
+                    break;
+                case vendorModel.user_id:
+                    var account_type = "vendor";
+                    break;
+                default:
+                    var account_type = "traveler";
+                    break;
+            }
+
+            // user details (id, name, email, account_type) 
+            user.push(users[i].id);
+            user.push(users[i].name);
+            user.push(users[i].email);
+            user.push(account_type); 
+        }
+
+        res.status(200).send({
+            message: "Users found successfully",
+            users: user
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 // disable user '$baseUrl/admin/disableUser/:id'
 
@@ -1118,5 +1169,6 @@ module.exports = {
     systemComplaintsResolved,
     systemComplaintsIgnored,
     ignore,
-    action
+    action,
+    viewUsers
 };
