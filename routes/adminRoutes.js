@@ -76,4 +76,5 @@ router.delete('/deleteUser/:id', validateUser, deleteUser);
 router.get('/users/sortByName', validateUser, sortByName);
 router.get('/users/sortByTrips', validateUser, sortByTrips);
 
+
 module.exports = router;

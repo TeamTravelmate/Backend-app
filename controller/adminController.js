@@ -10,6 +10,7 @@ const {
     trip: tripModel,
     sequelize
 } = require('../models');
+const { Op } = require('sequelize');
 
 // *** handle complaints ***
 // view complaint '$baseUrl/admin/viewComplaint/:id'
@@ -1305,8 +1306,7 @@ async function sortByTrips(req, res) {
     }
 }
 
-// filter users by role '$baseUrl/admin/users/filter/role'
-
+// filter users by role '$baseUrl/admin/users/filter/:role'
 
 // *** Admin Panel ***
 
