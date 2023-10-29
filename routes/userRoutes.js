@@ -3,6 +3,7 @@ const router = require('express').Router();
 
 const validateUser = require('../middleware/validateUser');
 const { uploadMiddleware } = require('../middleware/upload');
+const { upload_postMiddleware } = require('../middleware/upload_post');
 const {
     register,
     login,
@@ -34,7 +35,7 @@ router.get('/followingCount', validateUser, followingCount);
 router.put('/editProfile', validateUser, uploadMiddleware.single('file'), editProfile);
 router.put('/updatePassword', validateUser, updatePassword);
 
-router.post('/createPost', validateUser, createPost);
+router.post('/createPost', validateUser, upload_postMiddleware.single('file'), createPost);
 router.get('/post/:postId', validateUser, post);
 router.get('/myPosts', validateUser, myPosts);
 router.get('/posts', validateUser, posts);

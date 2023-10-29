@@ -380,20 +380,21 @@ async function upgrade_vendor(req, res) {
 
 // create post '$baseUrl/user/createPost'
 async function createPost(req, res) {
-    let {
-        content
-    } = req.body;
-
-    const userId = req.user.userId;
 
     try {
+        const userId = req.user.userId;
+        const filePath = req.file?.path;
         const newPost = await postModel.create({
-            content: content,
+            content: req.body.content,
             shareCount: 0,
             reactCount: 0,
             commentCount: 0,
-            userID: userId
-        });
+            media: filePath,
+            userID: userId    
+        }
+        
+        
+        );
         res.status(200).send({
             message: "Post successfully added",
             newPost: newPost

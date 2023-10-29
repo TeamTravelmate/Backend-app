@@ -13,19 +13,22 @@ module.exports = {
         type: Sequelize.STRING
       },
       media: {
-        type: Sequelize.BLOB
+        type: Sequelize.STRING
       },
       userID: {
         type: Sequelize.INTEGER
       },
       reactCount: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue:0
       },
       commentCount: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue:0
       },
       shareCount: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue:0
       },
       createdAt: {
         allowNull: false,
