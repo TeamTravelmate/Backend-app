@@ -654,6 +654,7 @@ async function myShippingDetails(req, res){
 //checkout '$baseUrl/vendor/checkout/:id'
 async function addToCheckout(req, res){
     const userID = req.user.userId;
+    let order = 0;
     let sum = 0;
 
     const {
@@ -661,6 +662,7 @@ async function addToCheckout(req, res){
     } = req.body;
 
     try{
+        // get the total amount of the products in the cart
         const cart = await cartModel.findAll({
             where: {
                 traveler_id: userID,
@@ -669,9 +671,10 @@ async function addToCheckout(req, res){
         })
 
         for(let i=0; i < cart.length; i++){
-            sum = sum + cart.product_amount;
+            order = order + cart.product_amount;
         }
 
+        // get the delivery amount
         const shippingAddress = await shipping_detailsModel.findOne({
             where: {
                 user_id : userID
@@ -685,13 +688,23 @@ async function addToCheckout(req, res){
             delivery_amount = 250.0
         }
 
+        // get the total amount
+        sum = order + delivery_amount;
+
+        // add to checkout
         const checkout = await checkoutModel.create({
-            amount: sum,
+            amount: order,
             traveler_id: userID,
             vendor_id: cart.vendor_id,
             delivery_method: delivery_method,
             delivery_amount: delivery_amount
         })
+
+        res.status(201).send({
+            message: "Checkout added successfully!",
+            total_amount: sum,
+            checkout: checkout
+        });
 
     } catch(err){
         console.log(err);
