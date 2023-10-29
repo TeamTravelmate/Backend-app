@@ -769,7 +769,7 @@ async function clearCart(req, res){
 }
 
 //view my orders - traveller  '$baseUrl/vendor/myOrders/:user_id'
-async function MyOrders(req, res){
+async function myOrders(req, res){
     try{
         const orders = await cartModel.findAll({
             where: {
@@ -865,5 +865,8 @@ module.exports = {
     removeFromCart,
     addShippingDetails,
     deleteShippingDetails,
-    myShippingDetails
+    myShippingDetails,
+    myOrders,
+    getVendorOrders,
+    clearCart
 }
