@@ -653,7 +653,7 @@ async function myShippingDetails(req, res){
 //checkout '$baseUrl/vendor/checkout'
 
 //my orders - vendor '$baseUrl/vendor/myOrders'
-async function getMyOrders(req, res){
+async function getVendorOrders(req, res){
     try{
         const orders = await orderModel.findAll({
             where: {
@@ -704,7 +704,7 @@ async function clearCart(req, res){
 }
 
 //view my orders - traveller  '$baseUrl/vendor/myOrders/:user_id'
-async function getMyOrders(req, res){
+async function MyOrders(req, res){
     try{
         const orders = await orderModel.findAll({
             where: {
