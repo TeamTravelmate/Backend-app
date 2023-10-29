@@ -7,6 +7,7 @@ const {
     travel_guide: travel_guideModel,
     service_provider: service_providerModel,
     vendor: vendorModel,
+    trip: tripModel,
     sequelize
 } = require('../models');
 
@@ -1188,15 +1189,121 @@ async function deleteUser(req, res) {
     }
 }
 
-// sort users by alphabetical order '$baseUrl/admin/users/sort'
+// sort users by name - asc '$baseUrl/admin/users/sortBYName'
+async function sortByName(req, res) {
+    const user = [];
 
-// sort users by number of posts '$baseUrl/admin/users/sort/posts'
+    try {
+        const users = await userModel.findAll({
+            order: [
+                ['firstName', 'ASC']
+            ],
+            attributes: ['id', 'firstName', 'lastName', 'email']
+        });
 
-// sort users by number of comments '$baseUrl/admin/users/sort/comments'
+        for (let i = 0; i < users.length; i++) {
+            // get user's name = firstName + lastName
+            users[i].name = users[i].firstName + " " + users[i].lastName;
+            console.log(users[i].name); 
 
-// sort users by number of complaints '$baseUrl/admin/users/sort/complaints'
+            // get account type 
+            switch (users[i].id) {
+                case travel_guideModel.user_id:
+                    var account_type = "travel guide";
+                    break;
+                case service_providerModel.user_id:
+                    var account_type = "service provider";
+                    break;
+                case vendorModel.user_id:
+                    var account_type = "vendor";
+                    break;
+                default:
+                    var account_type = "traveler";
+                    break;
+            }
+
+            // user details (id, name, email, account_type) 
+            user.push(users[i].id);
+            user.push(users[i].name);
+            user.push(users[i].email);
+            user.push(account_type); 
+        }
+
+        res.status(200).send({
+            message: "Users sorted successfully",
+            users: user
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 // sort users by number of trips '$baseUrl/admin/users/sort/trips'
+async function sortByTrips(req, res) {
+    try {
+        // get the number of trips planned by each user and sort them
+        const plannedTrips = await tripModel.findAll({
+            attributes: ['user_id', [sequelize.fn('COUNT', sequelize.col('user_id')), 'trips']],
+            group: ['user_id'],
+            order: [
+                [sequelize.literal('COUNT(user_id)'), 'DESC']
+            ]
+        });
+
+        // get the user details
+        const user = [];
+
+        for (let i = 0; i < plannedTrips.length; i++) {
+            const user_details = await userModel.findOne({
+                where: {
+                    id: plannedTrips[i].user_id
+                },
+                attributes: ['id', 'firstName', 'lastName', 'email']
+            });
+
+            // concat user's name
+            user_details.name = user_details.firstName + " " + user_details.lastName;
+
+            // get user account type
+            switch (user_details.id) {
+                case travel_guideModel.user_id:
+                    var account_type = "travel guide";
+                    break;
+                case service_providerModel.user_id:
+                    var account_type = "service provider";
+                    break;
+                case vendorModel.user_id:
+                    var account_type = "vendor";
+                    break;
+                default:
+                    var account_type = "traveler";
+                    break;
+            }
+
+            // user details (id, name, email, account_type)
+            user.push(user_details.id);
+            user.push(user_details.name);
+            user.push(user_details.email);
+            user.push(account_type); 
+        }
+
+        res.status(200).send({
+            message: "Users sorted successfully",
+            trips: plannedTrips,
+            users: user
+        });
+        
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 // filter users by role '$baseUrl/admin/users/filter/role'
 
@@ -1225,5 +1332,7 @@ module.exports = {
     action,
     viewUsers,
     disableUser,
-    deleteUser
+    deleteUser,
+    sortByName,
+    sortByTrips
 };

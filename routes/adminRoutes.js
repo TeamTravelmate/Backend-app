@@ -22,6 +22,8 @@ const {
     viewUsers,
     disableUser,
     deleteUser,
+    sortByName,
+    sortByTrips,
 } =  require('../controller/adminController');
 
 // ***handle complaints***
@@ -69,5 +71,9 @@ router.put('/disableUser/:id', validateUser, disableUser);
 
 // delete user
 router.delete('/deleteUser/:id', validateUser, deleteUser);
+
+// sort users
+router.get('/users/sortByName', validateUser, sortByName);
+router.get('/users/sortByTrips', validateUser, sortByTrips);
 
 module.exports = router;
