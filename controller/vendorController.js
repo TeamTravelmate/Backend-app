@@ -7,6 +7,7 @@ const{
     delivery_method: delivery_methodModel,
     shipping_details: shipping_detailsModel,
     user_order: orderModel,
+    checkout: checkoutModel,
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
@@ -651,14 +652,47 @@ async function myShippingDetails(req, res){
 }
 
 //checkout '$baseUrl/vendor/checkout/:id'
-async function myCheckout(req, res){
-    const cartID = req.params.id;
+async function addToCheckout(req, res){
+    const userID = req.user.userId;
+    let sum = 0;
+
+    const {
+        delivery_method,
+    } = req.body;
+
     try{
-        const checkout = await cartModel.findAll({
+        const cart = await cartModel.findAll({
             where: {
-                id : cartID
+                traveler_id: userID,
+                status: "pending"
             }
         })
+
+        for(let i=0; i < cart.length; i++){
+            sum = sum + cart.product_amount;
+        }
+
+        const shippingAddress = await shipping_detailsModel.findOne({
+            where: {
+                user_id : userID
+            },
+            attributes: ['city']
+        })
+
+        if(shippingAddress.city == 'colombo'){
+            delivery_amount = 150.0
+        } else {
+            delivery_amount = 250.0
+        }
+
+        const checkout = await checkoutModel.create({
+            amount: sum,
+            traveler_id: userID,
+            vendor_id: cart.vendor_id,
+            delivery_method: delivery_method,
+            delivery_amount: delivery_amount
+        })
+
     } catch(err){
         console.log(err);
         res.status(500).send({
