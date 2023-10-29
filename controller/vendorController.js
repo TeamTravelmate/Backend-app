@@ -373,7 +373,7 @@ async function addToCart(req, res){
                 const cart = await cartModel.create({
                     product_id: productID,
                     quantity: Quantity, 
-                    product_amount: product.price,
+                    product_amount: product.price * Quantity,
                     traveler_id: userID,
                     vendor_id: product.user_id
                 });
@@ -650,19 +650,35 @@ async function myShippingDetails(req, res){
     }
 }
 
-//checkout '$baseUrl/vendor/checkout'
+//checkout '$baseUrl/vendor/checkout/:id'
+async function myCheckout(req, res){
+    const cartID = req.params.id;
+    try{
+        const checkout = await cartModel.findAll({
+            where: {
+                id : cartID
+            }
+        })
+    } catch(err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
 
 //my orders - vendor '$baseUrl/vendor/myOrders'
 async function getVendorOrders(req, res){
+    const userID = req.user.userId;
     try{
-        const orders = await orderModel.findAll({
+        const orders = await cartModel.findAll({
             where: {
                 user_id: userID
             },
             include: [{
-                model: cartModel,
-                on: sequelize.literal('cart.id = order.cart_id'),
-                attributes: ['id','quantity','product_amount']
+                model: product_detailsModel,
+                on: sequelize.literal('cart.product_id = product_details.id'),
+                attributes: ['colour', 'size']
             }],
             attributes: ['id,','user_id']
         })
