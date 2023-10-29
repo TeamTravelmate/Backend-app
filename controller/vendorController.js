@@ -720,7 +720,8 @@ async function getVendorOrders(req, res){
     try{
         const orders = await cartModel.findAll({
             where: {
-                user_id: userID
+                vendor_id: userID,
+                status: "success"
             },
             include: [{
                 model: product_detailsModel,
@@ -742,9 +743,10 @@ async function getVendorOrders(req, res){
 async function clearCart(req, res){
     const userID = req.user.userId
     try{
-        const cart = await cartModel.destroy({
+        const cart = await cartModel.update({
             where: {
-                user_id: userID
+                user_id: userID,
+                status: "success"
             }
         })
         if(!cart) {
@@ -769,16 +771,17 @@ async function clearCart(req, res){
 //view my orders - traveller  '$baseUrl/vendor/myOrders/:user_id'
 async function MyOrders(req, res){
     try{
-        const orders = await orderModel.findAll({
+        const orders = await cartModel.findAll({
             where: {
-                user_id: userID
+                traveler_id: userID,
+                status: "success"
             },
             include: [{
-                model: cartModel,
-                on: sequelize.literal('cart.id = order.cart_id'),
-                attributes: ['id','quantity','product_amount']
+                model: product_detailsModel,
+                on: sequelize.literal('cart.product_id = product_details.id'),
+                attributes: ['id','colour','size']
             }],
-            attributes: ['id,','user_id']
+            attributes: ['id,','user_id','quantity','product_amount']
         })
         res.status(200).send(orders);
     } catch(err){
