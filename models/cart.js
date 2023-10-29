@@ -14,6 +14,12 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.product_details, {
         foreignKey: 'product_id'
       })
+      this.belongsTo(models.User, {
+        foreignKey: 'traveler_id'
+      })
+      this.belongsTo(models.User, {
+        foreignKey: 'vendor_id'
+      })
     }
   }
   cart.init({
@@ -21,7 +27,11 @@ module.exports = (sequelize, DataTypes) => {
     quantity: DataTypes.INTEGER,
     product_amount: DataTypes.NUMERIC,
     traveler_id: DataTypes.INTEGER,
-    vendor_id: DataTypes.INTEGER
+    vendor_id: DataTypes.INTEGER,
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: "pending"
+    }
   }, {
     sequelize,
     modelName: 'cart',

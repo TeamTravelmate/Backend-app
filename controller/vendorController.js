@@ -7,6 +7,7 @@ const{
     delivery_method: delivery_methodModel,
     shipping_details: shipping_detailsModel,
     user_order: orderModel,
+    checkout: checkoutModel,
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
@@ -373,7 +374,7 @@ async function addToCart(req, res){
                 const cart = await cartModel.create({
                     product_id: productID,
                     quantity: Quantity, 
-                    product_amount: product.price,
+                    product_amount: product.price * Quantity,
                     traveler_id: userID,
                     vendor_id: product.user_id
                 });
@@ -650,19 +651,81 @@ async function myShippingDetails(req, res){
     }
 }
 
-//checkout '$baseUrl/vendor/checkout'
+//checkout '$baseUrl/vendor/checkout/:id'
+async function addToCheckout(req, res){
+    const userID = req.user.userId;
+    let order = 0;
+    let sum = 0;
+
+    const {
+        delivery_method,
+    } = req.body;
+
+    try{
+        // get the total amount of the products in the cart
+        const cart = await cartModel.findAll({
+            where: {
+                traveler_id: userID,
+                status: "pending"
+            }
+        })
+
+        for(let i=0; i < cart.length; i++){
+            order = order + cart.product_amount;
+        }
+
+        // get the delivery amount
+        const shippingAddress = await shipping_detailsModel.findOne({
+            where: {
+                user_id : userID
+            },
+            attributes: ['city']
+        })
+
+        if(shippingAddress.city == 'colombo'){
+            delivery_amount = 150.0
+        } else {
+            delivery_amount = 250.0
+        }
+
+        // get the total amount
+        sum = order + delivery_amount;
+
+        // add to checkout
+        const checkout = await checkoutModel.create({
+            amount: order,
+            traveler_id: userID,
+            vendor_id: cart.vendor_id,
+            delivery_method: delivery_method,
+            delivery_amount: delivery_amount
+        })
+
+        res.status(201).send({
+            message: "Checkout added successfully!",
+            total_amount: sum,
+            checkout: checkout
+        });
+
+    } catch(err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
 
 //my orders - vendor '$baseUrl/vendor/myOrders'
-async function getMyOrders(req, res){
+async function getVendorOrders(req, res){
+    const userID = req.user.userId;
     try{
-        const orders = await orderModel.findAll({
+        const orders = await cartModel.findAll({
             where: {
                 user_id: userID
             },
             include: [{
-                model: cartModel,
-                on: sequelize.literal('cart.id = order.cart_id'),
-                attributes: ['id','quantity','product_amount']
+                model: product_detailsModel,
+                on: sequelize.literal('cart.product_id = product_details.id'),
+                attributes: ['colour', 'size']
             }],
             attributes: ['id,','user_id']
         })
@@ -704,7 +767,7 @@ async function clearCart(req, res){
 }
 
 //view my orders - traveller  '$baseUrl/vendor/myOrders/:user_id'
-async function getMyOrders(req, res){
+async function MyOrders(req, res){
     try{
         const orders = await orderModel.findAll({
             where: {

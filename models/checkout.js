@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
     traveler_id: DataTypes.INTEGER,
     vendor_id: DataTypes.INTEGER,
     status: DataTypes.STRING,
-    delivery_method: DataTypes.STRING
+    delivery_method: DataTypes.STRING,
+    delivery_amount: DataTypes.NUMERIC
   }, {
     sequelize,
     modelName: 'checkout',
