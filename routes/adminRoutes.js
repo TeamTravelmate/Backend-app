@@ -18,6 +18,7 @@ const {
     systemComplaintsResolved,
     systemComplaintsIgnored,
     ignore,
+    action,
 } =  require('../controller/adminController');
 
 // ***handle complaints***
@@ -51,5 +52,8 @@ router.get('/systemComplaintsIgnored', validateUser, systemComplaintsIgnored);
 
 // ignore complaint
 router.put('/ignoreComplaint/:id', validateUser, ignore);
+
+// take action on complaint
+router.put('/actionComplaint/:id', validateUser, action);
 
 module.exports = router;

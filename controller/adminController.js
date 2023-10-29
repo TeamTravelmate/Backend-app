@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const {
     User:userModel,
     post: postModel,
@@ -960,7 +961,120 @@ async function ignore(req, res) {
 }
 
 // take action on complaint '$baseUrl/admin/actionComplaint/:id'
+async function action(req, res) {
+    const complaintId = req.params.id;
+    try {
+        const complaint = await complaintModel.findOne({
+            where: {
+                id: complaintId
+            }
+        });
 
+        if (!complaint) {
+            res.status(404).send({
+                message: "Complaint not found"
+            });
+        }
+        else {
+            // take action according to the category
+            switch (complaint.category) {
+
+                case "post":
+                    // delete the post
+                    await postModel.destroy({
+                        where: {
+                            id: complaint.content_id
+                        }
+                    });
+
+                    // update the complaint status
+                    await complaint.update({
+                        status: "resolved"
+                    });
+
+                    res.status(200).send({
+                        message: "Complaint resolved successfully"
+                    });
+                    break;
+
+                case "comment":
+                    // delete the comment
+                    await comment_postModel.destroy({
+                        where: {
+                            id: complaint.content_id
+                        }
+                    });
+
+                    // update the complaint status
+                    await complaint.update({
+                        status: "resolved"
+                    });
+
+                    res.status(200).send({
+                        message: "Complaint resolved successfully"
+                    });
+                    break;
+
+                case "user":
+                    // diable user accounts
+                    await userModel.update({
+                        active: false
+                    }, {
+                        where: {
+                            id: complaint.content_id
+                        }
+                    });
+
+                    // update the complaint status
+                    await complaint.update({
+                        status: "resolved"
+                    });
+
+                    res.status(200).send({
+                        message: "Complaint resolved successfully"
+                    });
+                    break;
+
+                case "trip organizers":
+                    // diable user accounts
+                    await userModel.update({
+                        active: false
+                    }, {
+                        where: {
+                            id: complaint.content_id
+                        }
+                    });
+
+                    // update the complaint status
+                    await complaint.update({
+                        status: "resolved"
+                    });
+
+                    res.status(200).send({
+                        message: "Complaint resolved successfully"
+                    });
+                    break;
+
+                default:
+                    // update the complaint status
+                    await complaint.update({
+                        status: "resolved"
+                    });
+
+                    res.status(200).send({
+                        message: "Complaint resolved successfully"
+                    });
+                    break;
+            }
+        }
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
 
 
 // *** User Management ***
@@ -1003,5 +1117,6 @@ module.exports = {
     systemComplaintsPending,
     systemComplaintsResolved,
     systemComplaintsIgnored,
-    ignore
+    ignore,
+    action
 };
