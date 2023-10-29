@@ -1132,8 +1132,61 @@ async function viewUsers(req, res) {
 }
 
 // disable user '$baseUrl/admin/disableUser/:id'
+async function disableUser(req, res) {
+    try {
+        const user = await userModel.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!user) {
+            res.status(404).send({
+                message: "User not found"
+            });
+        }
+        else {
+            await user.update({
+                active: false
+            });
+            res.status(200).send({
+                message: "User Account disabled successfully"
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 // delete user '$baseUrl/admin/deleteUser/:id'
+async function deleteUser(req, res) {
+    try {
+        const user = await userModel.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!user) {
+            res.status(404).send({
+                message: "User not found"
+            });
+        } else {
+            await user.destroy();
+            res.status(200).send({
+                message: "User Account deleted successfully"
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 // sort users by alphabetical order '$baseUrl/admin/users/sort'
 
@@ -1170,5 +1223,7 @@ module.exports = {
     systemComplaintsIgnored,
     ignore,
     action,
-    viewUsers
+    viewUsers,
+    disableUser,
+    deleteUser
 };

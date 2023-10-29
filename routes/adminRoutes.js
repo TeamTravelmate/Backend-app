@@ -20,6 +20,8 @@ const {
     ignore,
     action,
     viewUsers,
+    disableUser,
+    deleteUser,
 } =  require('../controller/adminController');
 
 // ***handle complaints***
@@ -61,5 +63,11 @@ router.put('/actionComplaint/:id', validateUser, action);
 // *** User Management ***
 // view all users
 router.get('/viewUsers', validateUser, viewUsers);
+
+// disable user
+router.put('/disableUser/:id', validateUser, disableUser);
+
+// delete user
+router.delete('/deleteUser/:id', validateUser, deleteUser);
 
 module.exports = router;
