@@ -1,5 +1,8 @@
+
 const router = require('express').Router();
+
 const validateUser = require('../middleware/validateUser');
+const { uploadMiddleware } = require('../middleware/upload');
 const {
     register,
     login,
@@ -21,13 +24,14 @@ const {
     upgrade_service_provider,
     upgrade_vendor
 } =  require('../controller/userController');
+const { application } = require('express');
 
 router.post('/register', register);
 router.post('/login', login);
 
 router.get('/myProfile', validateUser, myProfile);
 router.get('/followingCount', validateUser, followingCount);
-router.put('/editProfile', validateUser, editProfile);
+router.put('/editProfile', validateUser, uploadMiddleware.single('file'), editProfile);
 router.put('/updatePassword', validateUser, updatePassword);
 
 router.post('/createPost', validateUser, createPost);

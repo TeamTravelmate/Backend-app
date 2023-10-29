@@ -1,5 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+
+
 const {
     User:userModel,
     post: postModel,
@@ -123,7 +126,7 @@ async function myProfile (req, res) {
             email: req.user.email
           },
           attributes: [
-            'firstName', 'lastName', 'username'
+            'firstName', 'lastName', 'username', 'profile_pic', 'phoneNo'
           ]
         })
         res.status(200).send(profile);
@@ -171,35 +174,33 @@ async function followingCount(req, res) {
 //edit profile '$baseUrl/user/editProfile'
 async function editProfile(req, res) {
     try {
-        let {
-          firstName,
-          lastName,
-          userName,
-          phoneNo
-        } = req.body;
-  
-        const user = await userModel.findOne({
-          where: {
-              email: req.user.email
-          }
-        });
-  
-        if (!user) {
-          return res.status(404).send({
-            message: 'User not found'
-          });
+      const filePath = req.file?.path;
+      const user = await userModel.findOne({
+        where: {
+          email: req.user.email
         }
+      });
   
-      user.firstName = firstName;
-      user.lastName = lastName;
-      user.username = userName;
-      user.phoneNo = phoneNo;
+      if (!user) {
+        return res.status(404).send({
+          message: 'User not found'
+        });
+      }
+  
+      user.firstName = req.body.firstName;
+      user.lastName = req.body.lastName;
+      user.username = req.body.userName;
+      user.phoneNo = req.body.phoneNo;
+  
+      if (filePath) {
+        user.profile_pic = filePath.split('/').pop();
+      }
   
       await user.save();
   
       res.status(200).send({
         message: 'Profile updated successfully',
-        user: user // Optionally, send back the updated user object
+        user // Optionally, send back the updated user object
       });
     } catch (err) {
       console.error(err);
@@ -207,7 +208,7 @@ async function editProfile(req, res) {
         message: 'Server error'
       });
     }
-}
+  }
 
 //update password '$baseUrl/user/updatePassword'
 async function updatePassword(req, res) {

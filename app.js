@@ -12,6 +12,8 @@ const vendorRoutes = require('./routes/vendorRoutes');
 const followerRoutes = require('./routes/followerRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
+app.use("/Images/pro_pic", express.static('Images/pro_pic'));
+
 app.use(bodyParser.json());
 sequelize
   .authenticate()
