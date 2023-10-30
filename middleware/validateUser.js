@@ -15,11 +15,11 @@ module.exports = (req, res, next) => {
             const tokenWithoutBearer = token.replace('Bearer ', '');
             const decoded = jwt.verify(tokenWithoutBearer, secretKey);
             req.user = decoded;
-            if (!decoded.isAdmin) {
-                return res.status(403).json({
-                  message: 'You are not authorized to access this route'
-                });
-            }
+            // if (!decoded.isAdmin) {
+            //     return res.status(403).json({
+            //       message: 'You are not authorized to access this route'
+            //     });
+            // }
             next();
         } catch (err) {
             return res.status(401).json({

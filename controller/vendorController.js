@@ -651,15 +651,12 @@ async function myShippingDetails(req, res){
     }
 }
 
-//checkout '$baseUrl/vendor/checkout/:id'
-async function addToCheckout(req, res){
-    const userID = req.user.userId;
-    let order = 0;
-    let sum = 0;
 
-    const {
-        delivery_method,
-    } = req.body;
+//*** Checkout functions ***
+// checkout - get order amount '$baseUrl/vendor/getOrderAmount/:id'
+async function getOrderAmount(req, res){
+    const userID = req.user.userId;
+    let order = 0.0;
 
     try{
         // get the total amount of the products in the cart
@@ -673,31 +670,90 @@ async function addToCheckout(req, res){
         for(let i=0; i < cart.length; i++){
             order = order + cart.product_amount;
         }
+        console.log(order);
+        // res.status(200).send(order);
+    } catch(err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
 
-        // get the delivery amount
-        const shippingAddress = await shipping_detailsModel.findOne({
+// checkout - user input delivery method  '$baseUrl/vendor/checkout/deliveryMethod/:id'
+async function getDeliveryMethod(req, res){
+    const userID = req.user.userId;
+    const {
+        delivery_method
+    } = req.body;
+
+    try{
+        const delivery = await delivery_methodModel.findOne({
             where: {
-                user_id : userID
-            },
-            attributes: ['city']
+                user_id: userID,
+                delivery_method: delivery_method
+            }
         })
 
-        if(shippingAddress.city == 'colombo'){
-            delivery_amount = 150.0
-        } else {
-            delivery_amount = 250.0
-        }
+        if(!delivery){
+            res.status(404).send({
+                message: "Delivery method not found!"
+            });
+        } 
+        res.status(200).send(delivery);
+    } catch(err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
 
+// checkout - get delivery amount '$baseUrl/vendor/checkout/deliveryAmount/:id'
+async function getDeliveryAmount(req, res){
+    const userID = req.user.userId;
+    const delivery_amount = 0.0;
+
+    try{
+            // get the delivery amount
+            const shippingAddress = await shipping_detailsModel.findOne({
+                where: {
+                    user_id : userID
+                },
+                attributes: ['city']
+            })
+
+            if(shippingAddress.city == 'colombo'){
+                delivery_amount = 150.0
+            }
+            else {
+                delivery_amount = 250.0
+            }
+        res.status(200).send(delivery_amount);
+    } catch(err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
+
+// checkout - get total amount '$baseUrl/vendor/checkout/:id'
+async function addToCheckout(req, res){
+    const userID = req.user.userId;
+    let sum = 0;
+
+    try{
         // get the total amount
-        sum = order + delivery_amount;
+        sum = getOrderAmount.order + getDeliveryAmount.delivery_amount;
 
         // add to checkout
         const checkout = await checkoutModel.create({
-            amount: order,
+            amount: getOrderAmount.order,
             traveler_id: userID,
             vendor_id: cart.vendor_id,
-            delivery_method: delivery_method,
-            delivery_amount: delivery_amount
+            delivery_method: getDeliveryMethod.delivery_method,
+            delivery_amount: getDeliveryAmount.delivery_amount
         })
 
         res.status(201).send({
@@ -713,6 +769,7 @@ async function addToCheckout(req, res){
         });
     }
 }
+
 
 //my orders - vendor '$baseUrl/vendor/myOrders'
 async function getVendorOrders(req, res){
@@ -866,6 +923,10 @@ module.exports = {
     addShippingDetails,
     deleteShippingDetails,
     myShippingDetails,
+    getOrderAmount,
+    getDeliveryMethod,
+    getDeliveryAmount,
+    addToCheckout,
     myOrders,
     getVendorOrders,
     clearCart

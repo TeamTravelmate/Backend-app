@@ -15,6 +15,7 @@ const {
 } = require('../models');
 const { Op } = require('sequelize');
 
+// *** Admin Authentication ***
 async function AdminRegister(req, res, next) {
     try {
         const {
@@ -116,6 +117,8 @@ async function AdminLogin(req, res, next) {
         });
     }
 }
+
+
 
 // *** handle complaints ***
 // view complaint '$baseUrl/admin/viewComplaint/:id'
