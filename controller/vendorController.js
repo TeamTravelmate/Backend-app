@@ -651,15 +651,11 @@ async function myShippingDetails(req, res){
     }
 }
 
-//checkout '$baseUrl/vendor/checkout/:id'
-async function addToCheckout(req, res){
-    const userID = req.user.userId;
-    let order = 0;
-    let sum = 0;
 
-    const {
-        delivery_method,
-    } = req.body;
+//*** Checkout functions ***
+// checkout - get order amount '$baseUrl/vendor/getOrderAmount'
+async function getOrderAmount(req, res){
+    const userID = req.user.userId;
 
     try{
         // get the total amount of the products in the cart
@@ -667,37 +663,103 @@ async function addToCheckout(req, res){
             where: {
                 traveler_id: userID,
                 status: "pending"
+            },
+            attributes: ['product_amount']
+        })
+
+        // calculate the total amount
+        let order = 0.0;
+        for (let i = 0; i < cart.length; i++) {
+            order = Number(order) + Number(cart[i].product_amount);
+        }
+
+        res.status(200).send({
+            message: "Order amount calculated successfully!",
+            order: order
+        });
+        
+    } catch(err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
+
+// checkout - user input delivery method  '$baseUrl/vendor/checkout/deliveryMethod'
+async function getDeliveryMethod(req, res){
+    const userID = req.user.userId;
+    const {
+        delivery_method
+    } = req.body;
+
+    try{
+        const delivery = await delivery_methodModel.findOne({
+            where: {
+                user_id: userID,
+                delivery_method: delivery_method
             }
         })
 
-        for(let i=0; i < cart.length; i++){
-            order = order + cart.product_amount;
-        }
+        if(!delivery){
+            res.status(404).send({
+                message: "Delivery method not found!"
+            });
+        } 
+        res.status(200).send(delivery);
+    } catch(err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
 
-        // get the delivery amount
-        const shippingAddress = await shipping_detailsModel.findOne({
-            where: {
-                user_id : userID
-            },
-            attributes: ['city']
-        })
+// checkout - get delivery amount '$baseUrl/vendor/checkout/deliveryAmount'
+async function getDeliveryAmount(req, res){
+    const userID = req.user.userId;
+    const delivery_amount = 0.0;
 
-        if(shippingAddress.city == 'colombo'){
-            delivery_amount = 150.0
-        } else {
-            delivery_amount = 250.0
-        }
+    try{
+            // get the delivery amount
+            const shippingAddress = await shipping_detailsModel.findOne({
+                where: {
+                    user_id : userID
+                },
+                attributes: ['city']
+            })
 
+            if(shippingAddress.city == 'colombo'){
+                delivery_amount = 150.0
+            }
+            else {
+                delivery_amount = 250.0
+            }
+        res.status(200).send(delivery_amount);
+    } catch(err){
+        console.log(err);
+        res.status(500).send({
+            message: "Server Error!"
+        });
+    }
+}
+
+// checkout - get total amount '$baseUrl/vendor/checkout/:id'
+async function addToCheckout(req, res){
+    const userID = req.user.userId;
+    let sum = 0;
+
+    try{
         // get the total amount
-        sum = order + delivery_amount;
+        sum = getOrderAmount.order + getDeliveryAmount.delivery_amount;
 
         // add to checkout
         const checkout = await checkoutModel.create({
-            amount: order,
+            amount: getOrderAmount.order,
             traveler_id: userID,
             vendor_id: cart.vendor_id,
-            delivery_method: delivery_method,
-            delivery_amount: delivery_amount
+            delivery_method: getDeliveryMethod.delivery_method,
+            delivery_amount: getDeliveryAmount.delivery_amount
         })
 
         res.status(201).send({
@@ -714,13 +776,15 @@ async function addToCheckout(req, res){
     }
 }
 
+
 //my orders - vendor '$baseUrl/vendor/myOrders'
 async function getVendorOrders(req, res){
     const userID = req.user.userId;
     try{
         const orders = await cartModel.findAll({
             where: {
-                user_id: userID
+                vendor_id: userID,
+                status: "success"
             },
             include: [{
                 model: product_detailsModel,
@@ -742,9 +806,10 @@ async function getVendorOrders(req, res){
 async function clearCart(req, res){
     const userID = req.user.userId
     try{
-        const cart = await cartModel.destroy({
+        const cart = await cartModel.update({
             where: {
-                user_id: userID
+                user_id: userID,
+                status: "success"
             }
         })
         if(!cart) {
@@ -767,18 +832,19 @@ async function clearCart(req, res){
 }
 
 //view my orders - traveller  '$baseUrl/vendor/myOrders/:user_id'
-async function MyOrders(req, res){
+async function myOrders(req, res){
     try{
-        const orders = await orderModel.findAll({
+        const orders = await cartModel.findAll({
             where: {
-                user_id: userID
+                traveler_id: userID,
+                status: "success"
             },
             include: [{
-                model: cartModel,
-                on: sequelize.literal('cart.id = order.cart_id'),
-                attributes: ['id','quantity','product_amount']
+                model: product_detailsModel,
+                on: sequelize.literal('cart.product_id = product_details.id'),
+                attributes: ['id','colour','size']
             }],
-            attributes: ['id,','user_id']
+            attributes: ['id,','user_id','quantity','product_amount']
         })
         res.status(200).send(orders);
     } catch(err){
@@ -862,5 +928,12 @@ module.exports = {
     removeFromCart,
     addShippingDetails,
     deleteShippingDetails,
-    myShippingDetails
+    myShippingDetails,
+    getOrderAmount,
+    getDeliveryMethod,
+    getDeliveryAmount,
+    addToCheckout,
+    myOrders,
+    getVendorOrders,
+    clearCart
 }

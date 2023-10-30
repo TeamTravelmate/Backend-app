@@ -17,7 +17,14 @@ const {
     removeFromCart,
     addShippingDetails,
     deleteShippingDetails,
-    myShippingDetails
+    myShippingDetails,
+    getOrderAmount,
+    getDeliveryMethod,
+    getDeliveryAmount,
+    addToCheckout,
+    myOrders,
+    getVendorOrders,
+    clearCart
 } =  require('../controller/vendorController');
 
 router.get('/products', validateUser, getAllProducts);
@@ -42,5 +49,14 @@ router.delete('/removeFromCart/:id', validateUser, removeFromCart);
 router.post('/addShippingDetails', validateUser, addShippingDetails);
 router.delete('/deleteShippingDetails/:id', validateUser, deleteShippingDetails);
 router.get('/myShippingDetails', validateUser, myShippingDetails);
+
+router.get('/getOrderAmount/:id', validateUser, getOrderAmount);
+router.get('/getDeliveryMethod', validateUser, getDeliveryMethod);
+router.get('/getDeliveryAmount', validateUser, getDeliveryAmount);
+router.post('/addToCheckout', validateUser, addToCheckout);
+
+router.get('/myOrders/:id', validateUser, myOrders);
+router.get('/getVendorOrders', validateUser, getVendorOrders);
+router.delete('/clearCart', validateUser, clearCart);
 
 module.exports = router;

@@ -1,11 +1,124 @@
 const { where } = require('sequelize');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const {
     User:userModel,
     post: postModel,
     comment_post: comment_postModel,
     complaint: complaintModel,
+    travel_guide: travel_guideModel,
+    service_provider: service_providerModel,
+    vendor: vendorModel,
+    trip: tripModel,
+    admin: adminModel,
     sequelize
 } = require('../models');
+const { Op } = require('sequelize');
+
+// *** Admin Authentication ***
+async function AdminRegister(req, res, next) {
+    try {
+        const {
+            username,
+            email,
+            password
+        } = req.body;
+
+        const checkAdmin = await adminModel.findOne({
+            where: {
+                [Op.or]: [
+                    { username: username },
+                    { email: email }
+                ]
+            }
+        });
+
+        if (checkAdmin) {
+            return res.status(409).send({
+                message: 'Admin Account already exists'
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const admin = await adminModel.create({
+            username,
+            email,
+            password: hashedPassword
+        });
+
+        //send a response to the client that the user was created with  the user object and token
+        res.status(201).send({
+            admin: admin,
+            message: 'Admin Account created successfully',
+            sessionToken: jwt.sign({ 
+                id: admin.id,
+                username: admin.username,
+                email: admin.email,
+                isAdmin: true
+            }, process.env.SECRET, { 
+                expiresIn: 60*60*24*30 
+            })
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Something went wrong'
+        });
+        console.log(error);
+    }
+}
+
+async function AdminLogin(req, res, next) {
+    try {
+        const {
+            email,
+            password
+        } = req.body;
+
+        // check if the admin exists
+        const admin = await adminModel.findOne({
+            where: {
+                email: email
+            }
+        });
+
+        if (!admin) {
+            return res.status(401).send({
+                message: 'Invalid email or password'
+            });
+        }
+
+        // check if the password is correct
+        const isPasswordValid = await bcrypt.compare(password, admin.password);
+        if (!isPasswordValid) {
+            return res.status(401).send({
+                message: 'Invalid email or password'
+            });
+        }
+
+        const token = jwt.sign({
+            id: admin.id,
+            username: admin.username,
+            email: admin.email,
+            isAdmin: true
+        }, process.env.SECRET, {
+            expiresIn: 60*60*24*30
+        });
+
+        res.status(200).send({
+            message: 'Admin Login successful',
+            status: true,
+            token: token
+        });
+    } catch (error) {
+        console.error('Error in AdminLogin: ', error);
+        res.status(500).send({
+            error: 'Internal server error'
+        });
+    }
+}
+
+
 
 // *** handle complaints ***
 // view complaint '$baseUrl/admin/viewComplaint/:id'
@@ -1077,30 +1190,251 @@ async function action(req, res) {
 }
 
 
+
 // *** User Management ***
-// view users '$baseUrl/admin/users'
+// view users '$baseUrl/admin/viewUsers'
+async function viewUsers(req, res) {
+    const user = [];
+
+    try {
+        const users = await userModel.findAll({
+            attributes: ['id', 'firstName', 'lastName', 'email']
+        });
+
+        for (let i = 0; i < users.length; i++) {
+            // get user's name = firstName + lastName
+            users[i].name = users[i].firstName + " " + users[i].lastName;
+            console.log(users[i].name); 
+
+            // get account type 
+            switch (users[i].id) {
+                case travel_guideModel.user_id:
+                    var account_type = "travel guide";
+                    break;
+                case service_providerModel.user_id:
+                    var account_type = "service provider";
+                    break;
+                case vendorModel.user_id:
+                    var account_type = "vendor";
+                    break;
+                default:
+                    var account_type = "traveler";
+                    break;
+            }
+
+            // user details (id, name, email, account_type) 
+            user.push(users[i].id);
+            user.push(users[i].name);
+            user.push(users[i].email);
+            user.push(account_type); 
+        }
+
+        res.status(200).send({
+            message: "Users found successfully",
+            users: user
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 // disable user '$baseUrl/admin/disableUser/:id'
+async function disableUser(req, res) {
+    try {
+        const user = await userModel.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!user) {
+            res.status(404).send({
+                message: "User not found"
+            });
+        }
+        else {
+            await user.update({
+                active: false
+            });
+            res.status(200).send({
+                message: "User Account disabled successfully"
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 // delete user '$baseUrl/admin/deleteUser/:id'
+async function deleteUser(req, res) {
+    try {
+        const user = await userModel.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
 
-// sort users by alphabetical order '$baseUrl/admin/users/sort'
+        if (!user) {
+            res.status(404).send({
+                message: "User not found"
+            });
+        } else {
+            await user.destroy();
+            res.status(200).send({
+                message: "User Account deleted successfully"
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
-// sort users by number of posts '$baseUrl/admin/users/sort/posts'
+// sort users by name - asc '$baseUrl/admin/users/sortBYName'
+async function sortByName(req, res) {
+    const user = [];
 
-// sort users by number of comments '$baseUrl/admin/users/sort/comments'
+    try {
+        const users = await userModel.findAll({
+            order: [
+                ['firstName', 'ASC']
+            ],
+            attributes: ['id', 'firstName', 'lastName', 'email']
+        });
 
-// sort users by number of complaints '$baseUrl/admin/users/sort/complaints'
+        for (let i = 0; i < users.length; i++) {
+            // get user's name = firstName + lastName
+            users[i].name = users[i].firstName + " " + users[i].lastName;
+            console.log(users[i].name); 
+
+            // get account type 
+            switch (users[i].id) {
+                case travel_guideModel.user_id:
+                    var account_type = "travel guide";
+                    break;
+                case service_providerModel.user_id:
+                    var account_type = "service provider";
+                    break;
+                case vendorModel.user_id:
+                    var account_type = "vendor";
+                    break;
+                default:
+                    var account_type = "traveler";
+                    break;
+            }
+
+            // user details (id, name, email, account_type) 
+            user.push(users[i].id);
+            user.push(users[i].name);
+            user.push(users[i].email);
+            user.push(account_type); 
+        }
+
+        res.status(200).send({
+            message: "Users sorted successfully",
+            users: user
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 // sort users by number of trips '$baseUrl/admin/users/sort/trips'
+async function sortByTrips(req, res) {
+    try {
+        // get the number of trips planned by each user and sort them
+        const plannedTrips = await tripModel.findAll({
+            attributes: ['user_id', [sequelize.fn('COUNT', sequelize.col('user_id')), 'trips']],
+            group: ['user_id'],
+            order: [
+                [sequelize.literal('COUNT(user_id)'), 'DESC']
+            ]
+        });
 
-// filter users by role '$baseUrl/admin/users/filter/role'
+        // get the user details
+        const user = [];
+
+        for (let i = 0; i < plannedTrips.length; i++) {
+            const user_details = await userModel.findOne({
+                where: {
+                    id: plannedTrips[i].user_id
+                },
+                attributes: ['id', 'firstName', 'lastName', 'email']
+            });
+
+            // concat user's name
+            user_details.name = user_details.firstName + " " + user_details.lastName;
+
+            // get user account type
+            switch (user_details.id) {
+                case travel_guideModel.user_id:
+                    var account_type = "travel guide";
+                    break;
+                case service_providerModel.user_id:
+                    var account_type = "service provider";
+                    break;
+                case vendorModel.user_id:
+                    var account_type = "vendor";
+                    break;
+                default:
+                    var account_type = "traveler";
+                    break;
+            }
+
+            // user details (id, name, email, account_type)
+            user.push(user_details.id);
+            user.push(user_details.name);
+            user.push(user_details.email);
+            user.push(account_type); 
+        }
+
+        res.status(200).send({
+            message: "Users sorted successfully",
+            trips: plannedTrips,
+            users: user
+        });
+        
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
+
+// filter users by role '$baseUrl/admin/users/filter/:role'
+
+
+
+// *** Handle Profile upgrade ***
+// view profile upgrade requests '$baseUrl/admin/profileUpgradeRequests'
+
+// approve profile upgrade request '$baseUrl/admin/approveProfileUpgrade/:id'
+
+// reject profile upgrade request '$baseUrl/admin/rejectProfileUpgrade/:id'
+
 
 
 // *** Admin Panel ***
 
 
+
 module.exports = {
+    AdminRegister,
+    AdminLogin,
     viewComplaint,
     postComplaintsPending,
     postComplaintsResolved,
@@ -1118,5 +1452,10 @@ module.exports = {
     systemComplaintsResolved,
     systemComplaintsIgnored,
     ignore,
-    action
+    action,
+    viewUsers,
+    disableUser,
+    deleteUser,
+    sortByName,
+    sortByTrips
 };

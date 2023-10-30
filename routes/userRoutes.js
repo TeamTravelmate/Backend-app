@@ -1,6 +1,5 @@
 
 const router = require('express').Router();
-
 const validateUser = require('../middleware/validateUser');
 const { uploadMiddleware } = require('../middleware/upload');
 const {
