@@ -653,10 +653,9 @@ async function myShippingDetails(req, res){
 
 
 //*** Checkout functions ***
-// checkout - get order amount '$baseUrl/vendor/getOrderAmount/:id'
+// checkout - get order amount '$baseUrl/vendor/getOrderAmount'
 async function getOrderAmount(req, res){
     const userID = req.user.userId;
-    let order = 0.0;
 
     try{
         // get the total amount of the products in the cart
@@ -664,14 +663,21 @@ async function getOrderAmount(req, res){
             where: {
                 traveler_id: userID,
                 status: "pending"
-            }
+            },
+            attributes: ['product_amount']
         })
 
-        for(let i=0; i < cart.length; i++){
-            order = order + cart.product_amount;
+        // calculate the total amount
+        let order = 0.0;
+        for (let i = 0; i < cart.length; i++) {
+            order = Number(order) + Number(cart[i].product_amount);
         }
-        console.log(order);
-        // res.status(200).send(order);
+
+        res.status(200).send({
+            message: "Order amount calculated successfully!",
+            order: order
+        });
+        
     } catch(err){
         console.log(err);
         res.status(500).send({
@@ -680,7 +686,7 @@ async function getOrderAmount(req, res){
     }
 }
 
-// checkout - user input delivery method  '$baseUrl/vendor/checkout/deliveryMethod/:id'
+// checkout - user input delivery method  '$baseUrl/vendor/checkout/deliveryMethod'
 async function getDeliveryMethod(req, res){
     const userID = req.user.userId;
     const {
@@ -709,7 +715,7 @@ async function getDeliveryMethod(req, res){
     }
 }
 
-// checkout - get delivery amount '$baseUrl/vendor/checkout/deliveryAmount/:id'
+// checkout - get delivery amount '$baseUrl/vendor/checkout/deliveryAmount'
 async function getDeliveryAmount(req, res){
     const userID = req.user.userId;
     const delivery_amount = 0.0;
