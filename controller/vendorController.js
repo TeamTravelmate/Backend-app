@@ -11,6 +11,7 @@ const{
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
+const product_details = require('../models/product_details');
 
 //***$baseUrl/vendor***
 //give all sales products '$baseUrl/vendor/products'
@@ -361,8 +362,16 @@ async function addToCart(req, res){
         const product = await product_detailsModel.findOne({
             where: {
                 id : productID
-            }
+            },
+           
+            include: [{
+                model: vendor_essentialModel,
+                on: sequelize.literal('vendor_essential.id = product_details.vendor_essential_id'),
+                attributes: ['user_id']
+            }]
         })
+        // const products = product.map(product_item => product_item.vendor_essential_id);
+        // console.log(product.vendor_essential.user_id);
 
             // check product availability
             if (product.quantity < Quantity){
@@ -376,7 +385,7 @@ async function addToCart(req, res){
                     quantity: Quantity, 
                     product_amount: product.price * Quantity,
                     traveler_id: userID,
-                    vendor_id: product.user_id
+                    vendor_id: product.vendor_essential.user_id
                 });
 
                 // 2. update quantity of product in product_details table 
@@ -656,7 +665,7 @@ async function myShippingDetails(req, res){
 // checkout - get order amount '$baseUrl/vendor/getOrderAmount/:id'
 async function getOrderAmount(req, res){
     const userID = req.user.userId;
-    let order = 0.0;
+    let order = 0;
 
     try{
         // get the total amount of the products in the cart
@@ -664,14 +673,28 @@ async function getOrderAmount(req, res){
             where: {
                 traveler_id: userID,
                 status: "pending"
-            }
+            },
+            attributes: ['product_amount','vendor_id']
         })
-
-        for(let i=0; i < cart.length; i++){
-            order = order + cart.product_amount;
+        if(cart.length === 0){
+            res.status(404).send({
+                message: "Cart is empty!"
+            });
+        } else {
+            
+            for (let i = 0; i < cart.length; i++) {
+                order = Number(order) + Number(cart[i].product_amount);
+            }
+            console.log(order);
+    
+            res.status(200).send({
+                message: "Order amount calculated successfully!",
+                order: order
+            });
+            return order;
         }
-        console.log(order);
-        // res.status(200).send(order);
+        // return order;
+
     } catch(err){
         console.log(err);
         res.status(500).send({
@@ -685,15 +708,16 @@ async function getDeliveryMethod(req, res){
     const userID = req.user.userId;
     const {
         delivery_method
-    } = req.body;
+    } = req.query;
 
     try{
+        console.log(delivery_method);
         const delivery = await delivery_methodModel.findOne({
             where: {
-                user_id: userID,
-                delivery_method: delivery_method
+                delivery_method: { [Op.iLike]: `${delivery_method}%` } 
             }
         })
+        
 
         if(!delivery){
             res.status(404).send({
@@ -712,7 +736,7 @@ async function getDeliveryMethod(req, res){
 // checkout - get delivery amount '$baseUrl/vendor/checkout/deliveryAmount/:id'
 async function getDeliveryAmount(req, res){
     const userID = req.user.userId;
-    const delivery_amount = 0.0;
+    let delivery_amount = 0.0;
 
     try{
             // get the delivery amount
@@ -729,7 +753,10 @@ async function getDeliveryAmount(req, res){
             else {
                 delivery_amount = 250.0
             }
-        res.status(200).send(delivery_amount);
+            res.status(200).send({
+                message: "delivery amount calculated successfully!",
+                order: delivery_amount
+            });
     } catch(err){
         console.log(err);
         res.status(500).send({
@@ -745,13 +772,14 @@ async function addToCheckout(req, res){
 
     try{
         // get the total amount
+        console.log(getOrderAmount.order);
         sum = getOrderAmount.order + getDeliveryAmount.delivery_amount;
 
         // add to checkout
         const checkout = await checkoutModel.create({
             amount: getOrderAmount.order,
             traveler_id: userID,
-            vendor_id: cart.vendor_id,
+            vendor_id: getOrderAmount.vendor_id,
             delivery_method: getDeliveryMethod.delivery_method,
             delivery_amount: getDeliveryAmount.delivery_amount
         })

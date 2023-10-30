@@ -50,7 +50,7 @@ router.post('/addShippingDetails', validateUser, addShippingDetails);
 router.delete('/deleteShippingDetails/:id', validateUser, deleteShippingDetails);
 router.get('/myShippingDetails', validateUser, myShippingDetails);
 
-router.get('/getOrderAmount/:id', validateUser, getOrderAmount);
+router.get('/getOrderAmount', validateUser, getOrderAmount);
 router.get('/getDeliveryMethod', validateUser, getDeliveryMethod);
 router.get('/getDeliveryAmount', validateUser, getDeliveryAmount);
 router.post('/addToCheckout', validateUser, addToCheckout);
