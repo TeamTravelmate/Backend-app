@@ -35,12 +35,14 @@ const {
   createReminder,
   getReminder,
   updateReminder,
-  deleteReminder
+  deleteReminder,
+  getCurrentTrips,
 } = require('../controller/tripController');
 
 // routes related to trips
 router.get('/', getPublicTrips);
 router.get('/myTrips', validateUser, getUserTrips);
+router.get('/currentTrips', validateUser, getCurrentTrips);
 router.get('/:tripId', getTripFromId);
 router.post('/', validateUser, createTrip);
 router.put('/', validateUser, updateTrip);
