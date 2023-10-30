@@ -40,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
     route_id:{
       type: DataTypes.INTEGER,
       allowNull:true,
+    },
+    status: {
+      type: DataTypes.ENUM('active', 'inactive', 'completed'),
+      defaultValue: 'active'
     }
   }, {
     sequelize,

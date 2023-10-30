@@ -69,10 +69,36 @@ async function getUserTrips(req, res) {
 
 // $baseUrl/trip/tripId gives a specific trip
 async function getTripFromId(req, res) {
-  // console.log(req.params);
+  console.log(req.params);
   try {
     const trips = await tripModel.findByPk(req.params.tripId);
     res.status(200).send(trips);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Server error"
+    });
+  }
+}
+
+// $baseUrl/trip/current gives the currently active trip of a user
+async function getCurrentTrips(req, res) {
+  try {
+    
+    const trips = await tripModel.findOne({
+      where: {
+        user_id: req.user.userId,
+        status: "active"
+      }
+    });
+    //check if trip is null
+    if (trips === null) {
+      res.status(404).send({
+        message: "No active trip found"
+      });
+    } else {
+      res.status(200).send(trips);
+    }
   } catch (err) {
     console.log(err);
     res.status(500).send({
@@ -1338,5 +1364,6 @@ module.exports = {
   createReminder,
   getReminder,
   updateReminder,
-  deleteReminder
+  deleteReminder,
+  getCurrentTrips,
 };

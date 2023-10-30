@@ -662,7 +662,7 @@ async function myShippingDetails(req, res){
 
 
 //*** Checkout functions ***
-// checkout - get order amount '$baseUrl/vendor/getOrderAmount/:id'
+// checkout - get order amount '$baseUrl/vendor/getOrderAmount'
 async function getOrderAmount(req, res){
     const userID = req.user.userId;
     let order = 0;
@@ -703,7 +703,7 @@ async function getOrderAmount(req, res){
     }
 }
 
-// checkout - user input delivery method  '$baseUrl/vendor/checkout/deliveryMethod/:id'
+// checkout - user input delivery method  '$baseUrl/vendor/checkout/deliveryMethod'
 async function getDeliveryMethod(req, res){
     const userID = req.user.userId;
     const {
@@ -733,7 +733,7 @@ async function getDeliveryMethod(req, res){
     }
 }
 
-// checkout - get delivery amount '$baseUrl/vendor/checkout/deliveryAmount/:id'
+// checkout - get delivery amount '$baseUrl/vendor/checkout/deliveryAmount'
 async function getDeliveryAmount(req, res){
     const userID = req.user.userId;
     let delivery_amount = 0.0;
