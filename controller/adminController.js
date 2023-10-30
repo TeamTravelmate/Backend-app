@@ -1,4 +1,6 @@
 const { where } = require('sequelize');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const {
     User:userModel,
     post: postModel,
@@ -8,9 +10,112 @@ const {
     service_provider: service_providerModel,
     vendor: vendorModel,
     trip: tripModel,
+    admin: adminModel,
     sequelize
 } = require('../models');
 const { Op } = require('sequelize');
+
+async function AdminRegister(req, res, next) {
+    try {
+        const {
+            username,
+            email,
+            password
+        } = req.body;
+
+        const checkAdmin = await adminModel.findOne({
+            where: {
+                [Op.or]: [
+                    { username: username },
+                    { email: email }
+                ]
+            }
+        });
+
+        if (checkAdmin) {
+            return res.status(409).send({
+                message: 'Admin Account already exists'
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const admin = await adminModel.create({
+            username,
+            email,
+            password: hashedPassword
+        });
+
+        //send a response to the client that the user was created with  the user object and token
+        res.status(201).send({
+            admin: admin,
+            message: 'Admin Account created successfully',
+            sessionToken: jwt.sign({ 
+                id: admin.id,
+                username: admin.username,
+                email: admin.email,
+                isAdmin: true
+            }, process.env.SECRET, { 
+                expiresIn: 60*60*24*30 
+            })
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Something went wrong'
+        });
+        console.log(error);
+    }
+}
+
+async function AdminLogin(req, res, next) {
+    try {
+        const {
+            email,
+            password
+        } = req.body;
+
+        // check if the admin exists
+        const admin = await adminModel.findOne({
+            where: {
+                email: email
+            }
+        });
+
+        if (!admin) {
+            return res.status(401).send({
+                message: 'Invalid email or password'
+            });
+        }
+
+        // check if the password is correct
+        const isPasswordValid = await bcrypt.compare(password, admin.password);
+        if (!isPasswordValid) {
+            return res.status(401).send({
+                message: 'Invalid email or password'
+            });
+        }
+
+        const token = jwt.sign({
+            id: admin.id,
+            username: admin.username,
+            email: admin.email,
+            isAdmin: true
+        }, process.env.SECRET, {
+            expiresIn: 60*60*24*30
+        });
+
+        res.status(200).send({
+            message: 'Admin Login successful',
+            status: true,
+            token: token
+        });
+    } catch (error) {
+        console.error('Error in AdminLogin: ', error);
+        res.status(500).send({
+            error: 'Internal server error'
+        });
+    }
+}
 
 // *** handle complaints ***
 // view complaint '$baseUrl/admin/viewComplaint/:id'
@@ -1082,6 +1187,7 @@ async function action(req, res) {
 }
 
 
+
 // *** User Management ***
 // view users '$baseUrl/admin/viewUsers'
 async function viewUsers(req, res) {
@@ -1308,10 +1414,24 @@ async function sortByTrips(req, res) {
 
 // filter users by role '$baseUrl/admin/users/filter/:role'
 
+
+
+// *** Handle Profile upgrade ***
+// view profile upgrade requests '$baseUrl/admin/profileUpgradeRequests'
+
+// approve profile upgrade request '$baseUrl/admin/approveProfileUpgrade/:id'
+
+// reject profile upgrade request '$baseUrl/admin/rejectProfileUpgrade/:id'
+
+
+
 // *** Admin Panel ***
 
 
+
 module.exports = {
+    AdminRegister,
+    AdminLogin,
     viewComplaint,
     postComplaintsPending,
     postComplaintsResolved,

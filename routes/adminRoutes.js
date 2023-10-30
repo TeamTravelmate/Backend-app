@@ -1,6 +1,13 @@
 const router = require('express').Router();
+const rateLimit = require("express-rate-limit"); 
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 requests per windowMs
+});
 const validateUser = require('../middleware/validateUser');
 const {
+    AdminRegister,
+    AdminLogin,
     viewComplaint,
     postComplaintsPending,
     postComplaintsResolved,
@@ -25,6 +32,10 @@ const {
     sortByName,
     sortByTrips,
 } =  require('../controller/adminController');
+
+// *** Admin Authentication ***
+router.post('/register', loginLimiter, AdminRegister);
+router.post('/login', loginLimiter, AdminLogin);
 
 // ***handle complaints***
 // view complaint
