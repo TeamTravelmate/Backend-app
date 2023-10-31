@@ -141,6 +141,7 @@ async function createTrip(req, res) {
       startDate,
       numberOfDays,
       startPlace,
+      destination,
       category
     } = req.body;
 
@@ -153,19 +154,12 @@ async function createTrip(req, res) {
       category: category,
       no_of_days: numberOfDays,
       starting_place: startPlace,
+      destination: destination,
       user_id: userId,
     });
     res.status(201).send({
       message: "Trip created successfully",
-      trip: {
-        id: newTrip.id,
-        starting_date: new Date(newTrip.starting_date).toLocaleDateString(),
-        category: newTrip.category,
-        numberOfDays: newTrip.no_of_days,
-        startingPlace: newTrip.starting_place,
-        user_id: newTrip.user_id
-      
-      }
+      trip: newTrip
     });
     // console.log(newTrip);
   } catch (err) {
@@ -525,7 +519,7 @@ async function createBudget(req, res) {
     } = req.body;
     const userId = req.user.userId;
     let budgetAmount = 0;
-    const newExpenses = [];
+    let newExpenses = [];
 
     const newBudget = await budgetModel.create({
       budget_amount: budgetAmount,
@@ -536,11 +530,12 @@ async function createBudget(req, res) {
       let {
         category,
         expense_name,
-        amount
+        amount,
+        date
       } = tripExpense;
       budgetAmount += amount;
 
-      category = capitalizeFirst(category);
+      // category = capitalizeFirst(category);
       const categoryId = await getCategoryId(category);
 
 
@@ -548,12 +543,31 @@ async function createBudget(req, res) {
         category: categoryId,
         expense_name: expense_name,
         amount: amount,
+        date: date,
         budget_id: newBudget.id,
         userID: userId
       });
 
       newExpenses.push(newExpense);
     }
+
+    newExpenses = await newBudget.getExpenses({
+      attributes: ['id', 'expense_name', 'amount', 'date'],
+      include: [{
+        model: budget_categoryModel,
+        attributes: ['category_name'],
+        required: true,
+      }]
+    });
+    newExpenses = newExpenses.map(expense => {
+      return {
+        id: expense.id,
+        expense_name: expense.expense_name,
+        amount: expense.amount,
+        category: expense.budget_category.category_name,
+        date: expense.date
+      };
+    })
 
     newBudget.amount = budgetAmount;
     await newBudget.save();
@@ -584,8 +598,15 @@ async function getBudget(req, res) {
       attributes: ['id', 'amount'],
     });
 
+    if (budget === null) {
+      res.status(404).send({
+        message: "Budget not found"
+      });
+      return;
+    }
+
     let expenses = await budget.getExpenses({
-      attributes: ['id', 'expense_name', 'amount'],
+      attributes: ['id', 'expense_name', 'amount', 'date'],
       include: [{
         model: budget_categoryModel,
         attributes: ['category_name'],
@@ -598,6 +619,7 @@ async function getBudget(req, res) {
         expense_name: expense.expense_name,
         amount: expense.amount,
         category: expense.budget_category.category_name,
+        date: expense.date
       };
     })
     res.status(200).send({
@@ -624,9 +646,7 @@ async function updateBudget(req, res) {
 
     const newExpenses = [];
     let budgetAmount = 0;
-    if (trip) {
-      budget.id = await getTripBudgetId(trip.id);
-    }
+
     //drop all previous expenses
     await expenseModel.destroy({
       where: {
@@ -639,11 +659,12 @@ async function updateBudget(req, res) {
         id,
         category,
         expense_name,
-        amount
+        amount,
+        date
       } = tripExpense;
       budgetAmount += amount;
 
-      category = capitalizeFirst(category);
+      // category = capitalizeFirst(category);
       const categoryId = await getCategoryId(category);
 
 
@@ -651,6 +672,7 @@ async function updateBudget(req, res) {
         expense_name: expense_name,
         amount: amount,
         category: categoryId,
+        date: date,
         budget_id: budget.id,
         userID: req.user.userId
       }, );
