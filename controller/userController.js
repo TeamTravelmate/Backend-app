@@ -61,6 +61,7 @@ async function register (req, res, next) {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
+                isAdmin: false
             }, process.env.SECRET, {
                 expiresIn: 60*60*24*30
             })
@@ -100,6 +101,7 @@ async function login (req, res, next) {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            isAdmin: false
         }, process.env.SECRET, {
             expiresIn: 60*60*24*30
         });
