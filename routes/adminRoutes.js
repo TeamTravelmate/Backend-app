@@ -27,15 +27,22 @@ const {
     ignore,
     action,
     viewUsers,
+    viewUser,
     disableUser,
     deleteUser,
     sortByName,
     sortByTrips,
+    filterByRole,
+    profileUpgradeRequests,
+    approveRequest,
+    rejectRequest,
 } =  require('../controller/adminController');
+
 
 // *** Admin Authentication ***
 router.post('/register', loginLimiter, AdminRegister);
 router.post('/login', loginLimiter, AdminLogin);
+
 
 // ***handle complaints***
 // view complaint
@@ -74,8 +81,9 @@ router.put('/actionComplaint/:id', validateAdmin, action);
 
 
 // *** User Management ***
-// view all users
+// view users
 router.get('/viewUsers', validateAdmin, viewUsers);
+router.get('/viewUser/:id', validateAdmin, viewUser);
 
 // disable user
 router.put('/disableUser/:id', validateAdmin, disableUser);
@@ -86,6 +94,20 @@ router.delete('/deleteUser/:id', validateAdmin, deleteUser);
 // sort users
 router.get('/users/sortByName', validateAdmin, sortByName);
 router.get('/users/sortByTrips', validateAdmin, sortByTrips);
+
+// filter users
+router.get('/users/filter/:role', validateAdmin, filterByRole);
+
+
+// *** Handle Profile Upgrade Requests ***
+// view profile upgrade requests
+router.get('/profileUpgradeRequests', validateAdmin, profileUpgradeRequests);
+
+// approve profile upgrade request
+router.put('/approveRequest/:id', validateAdmin, approveRequest);
+
+// reject profile upgrade request
+router.put('/rejectRequest/:id', validateAdmin, rejectRequest);
 
 
 module.exports = router;
