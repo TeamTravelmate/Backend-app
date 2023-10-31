@@ -176,9 +176,20 @@ async function getFollowers(req, res){
             attributes: ['firstName', 'lastName', 'username', 'email']
         });
 
+        // concat the first name and last name of the followers
+        const followersName = followersDetails.map(follower => follower.firstName + " " + follower.lastName);
+
+        // store the details of the followers (name and email)
+        const follower = followersDetails.map((follower, index) => {
+            return {
+                name: followersName[index],
+                email: follower.email
+            }
+        });
+
 
         res.status(200).json({
-            followersDetails
+            follower: follower
         });
 
     } catch (err) {
@@ -217,8 +228,19 @@ async function getFollowings(req, res){
             attributes: ['firstName', 'lastName', 'username', 'email']
         });
 
+        // concat the first name and last name of the followings
+        const followingsName = followingsDetails.map(following => following.firstName + " " + following.lastName);
+
+        // store the details of the followings (name and email)
+        const following = followingsDetails.map((following, index) => {
+            return {
+                name: followingsName[index],
+                email: following.email
+            }
+        });
+
         res.status(200).json({
-            followingsDetails
+            following: following
         });
     } catch (err) {
         console.log(err);
