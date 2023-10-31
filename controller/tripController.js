@@ -909,7 +909,7 @@ async function createItinerary(req, res) {
     const newItinerary = await trip_locationModel.create({
       tripID: tripId,
       day: day,
-      locationID: locationId,
+      location_id: locationId,
       activity_id: activityId,
     });
     res.status(201).send({
@@ -942,12 +942,12 @@ async function getItinerary(req, res) {
         'id', 'tripID', 'day'
       ],
       include: [
-        // {
-        //   model: locationModel,
-        //   on: sequelize.literal('location.id = trip_location.locationID'),
-        //   attributes: ['name'],
-        //   required: true,
-        // },
+        {
+          model: locationModel,
+          on: sequelize.literal('location.id = trip_location.location_id'),
+          attributes: ['name'],
+          required: true,
+        },
         {
           model: activityModel,
           on: sequelize.literal('activity.id = trip_location.activity_id'),
@@ -990,7 +990,7 @@ async function updateItinerary(req, res) {
     const updatedItinerary = await trip_locationModel.update({
       tripID: tripId,
       day: day,
-      locationID: locationId,
+      location_id: locationId,
       activity_id: activityId,
     }, {
       where: {
