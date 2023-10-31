@@ -26,6 +26,10 @@ const {
     upgrade_vendor
 } =  require('../controller/userController');
 const { application } = require('express');
+const { sp_nicMiddleware } = require('../middleware/sp_nic');
+const { sp_SLTDAMiddleware } = require('../middleware/sp_SLTDA');
+const { tg_SLTDAMiddleware } = require('../middleware/tg_SLTDA');
+const { vendor_licenseMiddleware } = require('../middleware/vendor_license');
 
 router.post('/register', register);
 router.post('/login', login);
@@ -46,8 +50,8 @@ router.get('/viewComments/:postId', validateUser, viewComments);
 router.put('/sharePost/:postId', validateUser, sharePost); 
 
 router.post('/fileComplaint/:id', validateUser, complaint);
-router.post('/upgrade_travelguide', validateUser, upgrade_guide);
-router.post('/upgrade_service_provider', validateUser, upgrade_service_provider);
-router.post('/upgrade_vendor', validateUser, upgrade_vendor);
+router.post('/upgrade_travelguide', validateUser, tg_SLTDAMiddleware.single('file'), upgrade_guide);
+router.post('/upgrade_service_provider', validateUser, sp_SLTDAMiddleware.single('file'),upgrade_service_provider);
+router.post('/upgrade_vendor', validateUser, vendor_licenseMiddleware.single('file'),upgrade_vendor);
 
 module.exports = router;

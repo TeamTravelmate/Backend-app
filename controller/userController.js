@@ -259,26 +259,23 @@ async function upgrade_guide(req, res) {
     try {
       let {
         nic,
-        nic_copy,
-        SLTDA_license,
         language,
-        no_of_experience,
-        experience_field,
+        num_of_experiences,
         price_per_day,
-        status
       } = req.body;
   
       const userId = req.user.userId;
+      const filePath1 = req.file.path;
 
       const newUpgrade = await travel_guideModel.create({
         nic: nic,
-        nic_copy: nic_copy,
-        SLTDA_license: SLTDA_license,
+        nic_copy: '656565',
+        SLTDA_license: filePath1,
         language: language,
-        no_of_experience: no_of_experience,
-        filed: experience_field,
+        no_of_experience: num_of_experiences,
+        filed: null,
         price_per_day: price_per_day,
-        status: status,
+        status: 0,
         user_id: userId,
       });
       res.status(201).send({
@@ -297,66 +294,61 @@ async function upgrade_guide(req, res) {
 //upgrade as a service provider '$baseUrl/user/upgradeServiceProvider'
 async function upgrade_service_provider(req, res) {
     try {
-      let {
-        nic,
-        nic_copy,
-        STLDA_license,
-        language,
-        no_of_experience,
-        experience_field,
-        price_per_hour,
-        address,
-        tel_no,
-        status
-      } = req.body;
-  
       const userId = req.user.userId;
+  
+      console.log(req.body.nic);
 
+      const filePath1 = req.file.path;
+
+  
+
+  
       const newUpgrade = await service_providerModel.create({
-        nic: nic,
-        nic_copy: nic_copy,
-        STLDA_license: STLDA_license,
-        language: language,
-        no_of_year: no_of_experience,
-        field: experience_field,
-        price_per_hour: price_per_hour,
-        address: address,
-        tel_no: tel_no,
-        status: status,
+        nic:req.body.nic,
+        nic_copy: '66549566',
+        STLDA_license: filePath1,
+        no_of_year: req.body.num_of_years,
+        field: req.body.field,
+        price_per_hour: req.body.price_per_hour,
+        address: req.body.address,
+        tel_no: req.body.tel_no,
+        status: 0,
+        language: req.body.language,
         user_id: userId,
       });
+  
       res.status(201).send({
         message: "Upgrade profile successfully",
-        upgrde: newUpgrade
+        upgrde: newUpgrade,
       });
+  
       console.log(newUpgrade);
     } catch (err) {
       console.log(err);
       res.status(500).send({
-        message: "Server error"
+        message: "Server error",
       });
     }
-};
+  };
 
 //upgrade as a vendor '$baseUrl/user/upgradevendor'
 async function upgrade_vendor(req, res) {
     try {
       let {
         address,
-        business_reg_no,
-        license_copy,
+        bussiness_reg_no,
         tel_no,
-        status,
       } = req.body;
   
       const userId = req.user.userId;
+      const filePath1 = req.file.path;
 
       const newUpgrade = await vendorModel.create({
         address: address,
-        business_reg_no: business_reg_no,
-        license_copy: license_copy,
+        bussiness_reg_no: bussiness_reg_no,
+        license_copy: filePath1,
         tel_no: tel_no,
-        status: status,
+        status: 0,
         user_id: userId,
       });
       res.status(201).send({

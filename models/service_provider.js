@@ -24,10 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     address: DataTypes.STRING,
     tel_no: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER,
-    status: {
-      type: DataTypes.INTEGER,
-      defaultValue:0
-    }
+    status: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'service_provider',
