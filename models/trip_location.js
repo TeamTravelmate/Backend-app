@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   trip_location.init({
     tripID: DataTypes.INTEGER,
-    locationID: DataTypes.INTEGER,
+    location_id: DataTypes.INTEGER,
     day: DataTypes.STRING,
     activity_id: DataTypes.INTEGER
   }, {
