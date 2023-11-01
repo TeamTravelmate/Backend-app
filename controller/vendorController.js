@@ -427,7 +427,8 @@ async function myCart(req, res){
     try{
         const cart = await cartModel.findAll({
             where: {
-                traveler_id : userID
+                traveler_id : userID,
+                status: 'pending'
             },
             attributes: ['id','quantity','product_amount','vendor_id','product_id']
         })
@@ -438,7 +439,7 @@ async function myCart(req, res){
             });
         } else {
             cart_items.push(cart);
-            
+
             const cart_products = cart.map(product => product.product_id);
 
             const products = await product_detailsModel.findAll({
@@ -453,6 +454,7 @@ async function myCart(req, res){
                     attributes: ['assential_name','description']
                 }]
             })
+           
             cart_product_details.push(products);
 
             for (let i = 0; i < cart_items.length; i++) {
