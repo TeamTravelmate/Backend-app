@@ -49,6 +49,17 @@ async function search (req,res) {
           //   ],
           // },
         });
+
+        // concat the first name and last name of the users
+        const usersName = users.map(user => user.firstName + " " + user.lastName);
+
+        // store the details of the users (name and username)
+        const user = users.map((user, index) => {
+            return {
+                name: usersName[index],
+                username: user.username
+            }
+        });
     
         if (!locations && !activities && !users) {
           res.status(404).send({
@@ -58,7 +69,7 @@ async function search (req,res) {
           res.status(200).send({
             locations,
             activities,
-            users
+            user
           });
         }
       } catch (err) { 
@@ -88,8 +99,19 @@ async function searchUsers (req,res) {
             message: "No results found"
           });
         } else {
+          // concat the first name and last name of the users
+          const usersName = users.map(user => user.firstName + " " + user.lastName);
+
+          // store the details of the users (name and email)
+          const user = users.map((user, index) => {
+              return {
+                  name: usersName[index],
+                  username: user.username
+              }
+          });
+
           res.status(200).send({
-            users
+            users : user
           });
         }
       } catch (err) { 

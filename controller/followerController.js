@@ -225,7 +225,7 @@ async function getFollowings(req, res){
             where: {
                 id: followingsArray
             },
-            attributes: ['firstName', 'lastName', 'username', 'email']
+            attributes: ['id','firstName', 'lastName', 'username', 'email']
         });
 
         // concat the first name and last name of the followings
@@ -234,6 +234,7 @@ async function getFollowings(req, res){
         // store the details of the followings (name and email)
         const following = followingsDetails.map((following, index) => {
             return {
+                id: following.id,
                 name: followingsName[index],
                 email: following.email
             }

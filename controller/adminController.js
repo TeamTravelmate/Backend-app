@@ -1242,6 +1242,70 @@ async function viewUsers(req, res) {
     }
 }
 
+// view user details '$baseUrl/admin/viewUser/:id'
+async function viewUser(req, res) {
+    try {
+        const user = await userModel.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!user) {
+            res.status(404).send({
+                message: "User not found"
+            });
+        } else {
+            // get the no of trip planned by the user
+            const trips = await tripModel.count({
+                where: {
+                    user_id: user.id
+                }
+            });
+
+            // get the no of posts by the user
+            const posts = await postModel.count({
+                where: {
+                    userID: user.id
+                }
+            });
+
+            // get the no of complaints to the user
+            const complaints = await complaintModel.count({
+                where: {
+                    content_id: user.id
+                }
+            });
+
+            // overall user details
+            const user_details = {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                username: user.username,
+                email: user.email,
+                phoneNo: user.phoneNo,
+                birthday: user.birthday,
+                gender: user.gender,
+                acc_created: user.createdAt,
+                trips: trips,
+                posts: posts,
+                complaints: complaints
+            }
+
+            res.status(200).send({
+                message: "User found successfully",
+                user: user_details
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
+
 // disable user '$baseUrl/admin/disableUser/:id'
 async function disableUser(req, res) {
     try {
@@ -1416,16 +1480,407 @@ async function sortByTrips(req, res) {
 }
 
 // filter users by role '$baseUrl/admin/users/filter/:role'
+async function filterByRole(req, res) {
+    try {
+        // get the role
+        const role = req.params.role;
 
+        switch (role) {
+            case "guide":
+                // get travel guides
+                const travel_guides = await travel_guideModel.findAll({
+                    attributes: ['user_id'],
+                    where: {
+                        status: 1
+                    },
+                    include: [{
+                        model: userModel,
+                        attributes: ['id', 'firstName', 'lastName', 'email']
+                    }]
+                });
+
+                // if there are no travel guides display a message
+                if (travel_guides.length === 0) {
+                    res.status(200).send({
+                        message: "No travel guides found"
+                    });
+                } else {
+                    // get the user details
+                    const user = [];
+
+                    for (let i = 0; i < travel_guides.length; i++) {
+                        // concat user's name
+                        travel_guides[i].user.name = travel_guides[i].user.firstName + " " + travel_guides[i].user.lastName;
+
+                        // user details (id, name, email)
+                        user.push(travel_guides[i].user.id);
+                        user.push(travel_guides[i].user.name);
+                        user.push(travel_guides[i].user.email);
+                        user.push('travel guide');
+                    }
+
+                    res.status(200).send({
+                        message: "Travel guides found successfully",
+                        users: user
+                    });
+                }
+                break;
+
+            case "provider":
+                // get service providers
+                const service_providers = await service_providerModel.findAll({
+                    attributes: ['user_id'],
+                    where: {
+                        status: 1
+                    },
+                    include: [{
+                        model: userModel,
+                        attributes: ['id', 'firstName', 'lastName', 'email']
+                    }]
+                });
+
+                // if there are no service providers display a message
+                if (service_providers.length === 0) {
+                    res.status(200).send({
+                        message: "No service providers found"
+                    });
+                } else {
+                    // get the user details
+                    const user = [];
+
+                    for (let i = 0; i < service_providers.length; i++) {
+                        // concat user's name
+                        service_providers[i].user.name = service_providers[i].user.firstName + " " + service_providers[i].user.lastName;
+
+                        // user details (id, name, email)
+                        user.push(service_providers[i].user.id);
+                        user.push(service_providers[i].user.name);
+                        user.push(service_providers[i].user.email);
+                        user.push('service provider');
+                    }
+
+                    res.status(200).send({
+                        message: "Service providers found successfully",
+                        users: user
+                    });
+                }
+                break;
+
+            case "vendor":
+                // get vendors
+                const vendors = await vendorModel.findAll({
+                    attributes: ['user_id'],
+                    where: {
+                        status: 1
+                    },
+                    include: [{
+                        model: userModel,
+                        attributes: ['id', 'firstName', 'lastName', 'email']
+                    }]
+                });
+
+                // if there are no vendors display a message
+                if (vendors.length === 0) {
+                    res.status(200).send({
+                        message: "No vendors found"
+                    });
+                } else {
+                    // get the user details
+                    const user = [];
+
+                    for (let i = 0; i < vendors.length; i++) {
+                        // concat user's name
+                        vendors[i].user.name = vendors[i].user.firstName + " " + vendors[i].user.lastName;
+
+                        // user details (id, name, email)
+                        user.push(vendors[i].user.id);
+                        user.push(vendors[i].user.name);
+                        user.push(vendors[i].user.email);
+                        user.push('vendor');
+                    }
+
+                    res.status(200).send({
+                        message: "Vendors found successfully",
+                        users: user
+                    });
+                }
+                break;
+
+            default:
+                // get travelers
+                const travelers = await userModel.findAll({
+                    where: {
+                        active: true
+                    },
+                    attributes: ['id', 'firstName', 'lastName', 'email']
+                });
+
+                // if there are no travelers display a message
+                if (travelers.length === 0) {
+                    res.status(200).send({
+                        message: "No travelers found"
+                    });
+                } else {
+                    // get the user details
+                    const user = [];
+
+                    for (let i = 0; i < travelers.length; i++) {
+                        // concat user's name
+                        travelers[i].name = travelers[i].firstName + " " + travelers[i].lastName;
+
+                        // user details (id, name, email)
+                        user.push(travelers[i].id);
+                        user.push(travelers[i].name);
+                        user.push(travelers[i].email);
+                        user.push('traveler');
+                    }
+
+                    res.status(200).send({
+                        message: "Travelers found successfully",
+                        users: user
+                    });
+                }
+                break;
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 
 // *** Handle Profile upgrade ***
 // view profile upgrade requests '$baseUrl/admin/profileUpgradeRequests'
+async function profileUpgradeRequests(req, res) {
+    try {
+        const travel_guide = await travel_guideModel.findAll({
+            where: {
+                status: 0
+            }
+        });
+
+        const service_provider = await service_providerModel.findAll({
+            where: {
+                status: 0
+            }
+        });
+
+        const vendor = await vendorModel.findAll({
+            where: {
+                status: 0
+            }
+        });
+
+        // if there are no requests display a message
+        if (!travel_guide && !service_provider && !vendor) {
+            res.status(200).send({
+                message: "No profile upgrade requests found"
+            });
+        } else {
+            // if there are requests, get the details of the user who requested
+            const guide = [];
+            const provider = [];
+            const user = []; // for vendors
+
+            // get travel guide details
+            for (let i = 0; i < travel_guide.length; i++) {
+                const user_details = await userModel.findOne({
+                    where: {
+                        id: travel_guide[i].user_id
+                    },
+                    attributes: ['id', 'firstName', 'lastName', 'email']
+                });
+
+                // concat user's name
+                user_details.name = user_details.firstName + " " + user_details.lastName;
+
+                // user details (id, name, email)
+                guide.push(user_details.id);
+                guide.push(user_details.name);
+                guide.push(user_details.email);
+            }
+
+            // get service provider details
+            for (let i = 0; i < service_provider.length; i++) {
+                const user_details = await userModel.findOne({
+                    where: {
+                        id: service_provider[i].user_id
+                    },
+                    attributes: ['id', 'firstName', 'lastName', 'email']
+                });
+
+                // concat user's name
+                user_details.name = user_details.firstName + " " + user_details.lastName;
+
+                // user details (id, name, email)
+                provider.push(user_details.id);
+                provider.push(user_details.name);
+                provider.push(user_details.email);
+            }
+
+            // get vendor details
+            for (let i = 0; i < vendor.length; i++) {
+                const user_details = await userModel.findOne({
+                    where: {
+                        id: vendor[i].user_id
+                    },
+                    attributes: ['id', 'firstName', 'lastName', 'email']
+                });
+
+                // concat user's name
+                user_details.name = user_details.firstName + " " + user_details.lastName;
+
+                // user details (id, name, email)
+                user.push(user_details.id);
+                user.push(user_details.name);
+                user.push(user_details.email);
+            }
+
+            res.status(200).send({
+                message: "Profile upgrade requests found successfully",
+                travel_guide: guide,
+                service_provider: provider,
+                vendor: user
+            });
+
+        }
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
 
 // approve profile upgrade request '$baseUrl/admin/approveProfileUpgrade/:id'
+async function approveRequest(req, res) {
+    try {
+        // get the user id
+        const user_id = req.params.id;
+
+        switch (user_id) {
+            case travel_guideModel.user_id:
+                // update the status of the travel guide
+                await travel_guideModel.update({
+                    status: 1
+                }, {
+                    where: {
+                        user_id: user_id
+                    }
+                });
+                res.status(200).send({
+                    message: "Profile upgrade request approved successfully"
+                });
+                break;
+
+            case service_providerModel.user_id:
+                // update the status of the service provider
+                await service_providerModel.update({
+                    status: 1
+                }, {
+                    where: {
+                        user_id: user_id
+                    }
+                });
+                res.status(200).send({
+                    message: "Profile upgrade request approved successfully"
+                });
+                break;
+
+            case vendorModel.user_id:
+                // update the status of the vendor
+                await vendorModel.update({
+                    status: 1
+                }, {
+                    where: {
+                        user_id: user_id
+                    }
+                });
+                res.status(200).send({
+                    message: "Profile upgrade request approved successfully"
+                });
+                break;
+
+            default:
+                res.status(404).send({
+                    message: "User not found"
+                });
+                break;
+        }
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
 
 // reject profile upgrade request '$baseUrl/admin/rejectProfileUpgrade/:id'
+async function rejectRequest(req, res) {
+    try {
+        // get the user id
+        const user_id = req.params.id;
 
+        switch (user_id) {
+            case travel_guideModel.user_id:
+                // update the status of the travel guide
+                await travel_guideModel.update({
+                    status: 2
+                }, {
+                    where: {
+                        user_id: user_id
+                    }
+                });
+                res.status(200).send({
+                    message: "Profile upgrade request rejected successfully"
+                });
+                break;
+
+            case service_providerModel.user_id:
+                // update the status of the service provider
+                await service_providerModel.update({
+                    status: 2
+                }, {
+                    where: {
+                        user_id: user_id
+                    }
+                });
+                res.status(200).send({
+                    message: "Profile upgrade request rejected successfully"
+                });
+                break;
+
+            case vendorModel.user_id:
+                // update the status of the vendor
+                await vendorModel.update({
+                    status: 2
+                }, {
+                    where: {
+                        user_id: user_id
+                    }
+                });
+                res.status(200).send({
+                    message: "Profile upgrade request rejected successfully"
+                });
+                break;
+
+            default:
+                res.status(404).send({
+                    message: "User not found"
+                });
+                break;
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
 
 
 // *** Admin Panel ***
@@ -1454,8 +1909,13 @@ module.exports = {
     ignore,
     action,
     viewUsers,
+    viewUser,
     disableUser,
     deleteUser,
     sortByName,
-    sortByTrips
+    sortByTrips,
+    filterByRole,
+    profileUpgradeRequests,
+    approveRequest,
+    rejectRequest
 };
