@@ -71,6 +71,7 @@ async function getProductsByCategory(req, res){
             where: {
                 vendor_essential_id: category_products
             },
+            attributes: ['id','price','quantity','colour','size', 'vendor_essential_id'],
             include: [{
                 model: vendor_essentialModel,
                 on: sequelize.literal('vendor_essential.id = product_details.vendor_essential_id'),
@@ -78,7 +79,9 @@ async function getProductsByCategory(req, res){
             }]
         })
 
-        res.status(200).send(product_details);
+        res.status(200).send({
+            products: product_details
+        });
     } catch (err){
         console.log(err);
         res.status(500).send({
@@ -141,7 +144,9 @@ async function getProduct(req, res) {
             }]
         })
 
-        res.status(200).send(product);
+        res.status(200).send({
+            product: product
+        });
     } catch (err){
         console.log(err);
         res.status(500).send({
