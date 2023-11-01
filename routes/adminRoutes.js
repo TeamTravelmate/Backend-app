@@ -82,7 +82,7 @@ router.put('/actionComplaint/:id', validateAdmin, action);
 
 // *** User Management ***
 // view users
-router.get('/viewUsers', validateAdmin, viewUsers);
+router.get('/viewUsers', viewUsers);
 router.get('/viewUser/:id', validateAdmin, viewUser);
 
 // disable user
