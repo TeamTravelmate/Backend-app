@@ -572,7 +572,8 @@ async function createBudget(req, res) {
     newBudget.amount = budgetAmount;
     await newBudget.save();
 
-
+    //make the amount a string
+    newBudget.amount = newBudget.amount.toString();
     res.status(201).send({
       message: "Budget created successfully",
       budget: newBudget,
@@ -597,6 +598,8 @@ async function getBudget(req, res) {
     const budget = await trip.getBudget({
       attributes: ['id', 'amount'],
     });
+
+    //convert the amount from string to number
 
     if (budget === null) {
       res.status(404).send({
