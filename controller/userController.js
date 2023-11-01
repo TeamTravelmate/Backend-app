@@ -456,7 +456,7 @@ async function myPosts(req, res) {
             {
               model: userModel,
             //   on: sequelize.literal('User.id = post.userID'),
-              attributes: ['firstName','lastName','username'],
+              attributes: ['firstName','lastName','username', 'profile_pic'],
               required: true,
             }
           ]
@@ -491,7 +491,7 @@ async function posts(req, res) {
             include: [
                 {
                     model: userModel,
-                    attributes: ['firstName','lastName','username'],
+                    attributes: ['firstName','lastName','username','profile_pic'],
                     required: true,
                 }
             ]
