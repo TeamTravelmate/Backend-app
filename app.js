@@ -13,6 +13,7 @@ const followerRoutes = require('./routes/followerRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
 app.use("/Images/pro_pic", express.static('Images/pro_pic'));
+app.use("/Images/post", express.static('Images/post'));
 
 app.use(bodyParser.json());
 sequelize
