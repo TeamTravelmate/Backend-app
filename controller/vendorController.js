@@ -75,12 +75,12 @@ async function getProductsByCategory(req, res){
             include: [{
                 model: vendor_essentialModel,
                 on: sequelize.literal('vendor_essential.id = product_details.vendor_essential_id'),
-                attributes: ['assential_name','user_id','description']
+                attributes: ['assential_name','user_id','description','category']
             }]
         })
 
         res.status(200).send({
-            products: product_details
+            products_category: product_details
         });
     } catch (err){
         console.log(err);
