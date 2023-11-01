@@ -22,7 +22,8 @@ const {
     complaint,
     upgrade_guide,
     upgrade_service_provider,
-    upgrade_vendor
+    upgrade_vendor,
+    getPoints
 } =  require('../controller/userController');
 const { application } = require('express');
 const { sp_nicMiddleware } = require('../middleware/sp_nic');
@@ -52,5 +53,7 @@ router.post('/fileComplaint/:id', validateUser, complaint);
 router.post('/upgrade_travelguide', validateUser, tg_SLTDAMiddleware.single('file'), upgrade_guide);
 router.post('/upgrade_service_provider', validateUser, sp_SLTDAMiddleware.single('file'),upgrade_service_provider);
 router.post('/upgrade_vendor', validateUser, vendor_licenseMiddleware.single('file'),upgrade_vendor);
+
+router.get('/getPoints', validateUser, getPoints);
 
 module.exports = router;
