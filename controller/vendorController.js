@@ -78,7 +78,9 @@ async function getProductsByCategory(req, res){
             }]
         })
 
-        res.status(200).send(product_details);
+        res.status(200).send({
+            products: product_details
+        }); 
     } catch (err){
         console.log(err);
         res.status(500).send({
