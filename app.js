@@ -5,6 +5,9 @@ const { sequelize } = require('./models');
 const app = express();
 const port = 3000;
 
+const cors = require('cors');
+app.use(cors());
+
 const tripRoutes = require('./routes/tripRoutes');
 const userRoutes = require('./routes/userRoutes');
 const searchRoutes = require('./routes/searchRoutes');

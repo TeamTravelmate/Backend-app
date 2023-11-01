@@ -788,7 +788,6 @@ async function complaint(req, res) {
 async function getPoints(req, res) {
     try {
         // get the number of trips planned by each user and sort them
-        // console.log(COUNT(user_id));
         const plannedTrips = await tripModel.findAll({
             attributes: ['user_id', [sequelize.fn('COUNT', sequelize.col('user_id')), 'trips']],
             group: ['user_id'],
@@ -796,6 +795,13 @@ async function getPoints(req, res) {
                 [sequelize.literal('COUNT(user_id)'), 'DESC']
             ]
         });
+
+        // calulate the points for each user
+        // 1. 10 points for each trip
+        const points = [];
+        for (let i = 0; i < plannedTrips.length; i++) {
+            points[i] = plannedTrips[i].dataValues.trips * 10;
+        }
 
         // get the user details
         const users = [];
@@ -805,36 +811,17 @@ async function getPoints(req, res) {
                 where: {
                     id: plannedTrips[i].user_id
                 },
-                attributes: ['firstName', 'lastName', 'username', 'profile_pic', 'email']
+                attributes: ['firstName', 'lastName']
             });
 
             // concat user's name
             user_details.name = user_details.firstName + " " + user_details.lastName;
 
-            // get user account type
-            switch (user_details.id) {
-                case travel_guideModel.user_id:
-                    var account_type = "travel guide";
-                    break;
-                case service_providerModel.user_id:
-                    var account_type = "service provider";
-                    break;
-                case vendorModel.user_id:
-                    var account_type = "vendor";
-                    break;
-                default:
-                    var account_type = "traveler";
-                    break;
-            }
-
 
             users.push({
                 user_id: plannedTrips[i].user_id,
                 name: user_details.name,
-                username: user_details.username,
-                profile_pic: user_details.profile_pic,
-                email: user_details.email,
-                account_type: account_type,
+                points: points[i],
                 trips: plannedTrips[i].dataValues.trips
             });
         }

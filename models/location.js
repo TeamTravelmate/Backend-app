@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'lodation_id'
       })
       this.hasMany(models.trip_location, {
-        foreignKey: 'locationID',
+        foreignKey: 'location_id',
       })
     }
   }
