@@ -14,6 +14,7 @@ const {
     travel_guide: travel_guideModel,
     service_provider: service_providerModel,
     vendor: vendorModel,
+    trip: tripModel,
     sequelize
 } = require('../models');
 const crypto = require('crypto');
@@ -783,6 +784,71 @@ async function complaint(req, res) {
     }
 }
 
+// sort users by number of trips '$baseUrl/user/getPoints'
+async function getPoints(req, res) {
+    try {
+        // get the number of trips planned by each user and sort them
+        // console.log(COUNT(user_id));
+        const plannedTrips = await tripModel.findAll({
+            attributes: ['user_id', [sequelize.fn('COUNT', sequelize.col('user_id')), 'trips']],
+            group: ['user_id'],
+            order: [
+                [sequelize.literal('COUNT(user_id)'), 'DESC']
+            ]
+        });
+        // console.log(COUNT(user_id));
+
+        // get the user details
+        const user = [];
+
+        for (let i = 0; i < plannedTrips.length; i++) {
+            const user_details = await userModel.findOne({
+                where: {
+                    id: plannedTrips[i].user_id
+                },
+                attributes: ['firstName', 'lastName', 'username', 'profile_pic']
+            });
+
+            // concat user's name
+            user_details.name = user_details.firstName + " " + user_details.lastName;
+
+            // get user account type
+            switch (user_details.id) {
+                case travel_guideModel.user_id:
+                    var account_type = "travel guide";
+                    break;
+                case service_providerModel.user_id:
+                    var account_type = "service provider";
+                    break;
+                case vendorModel.user_id:
+                    var account_type = "vendor";
+                    break;
+                default:
+                    var account_type = "traveler";
+                    break;
+            }
+
+            // user details (name, username, profile_pic, account_type)
+            user.push(user_details.name);
+            user.push(user_details.username);
+            user.push(user_details.profile_pic);
+            user.push(account_type); 
+        }
+
+        res.status(200).send({
+            message: "Users sorted successfully",
+            trips: plannedTrips,
+            users: user
+        });
+        
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: 'Server error'
+        });
+    }
+}
+
 module.exports = {
     register,
     login,
@@ -802,5 +868,6 @@ module.exports = {
     complaint,
     upgrade_guide,
     upgrade_service_provider,
-    upgrade_vendor
+    upgrade_vendor,
+    getPoints
 };
