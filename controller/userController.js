@@ -796,17 +796,16 @@ async function getPoints(req, res) {
                 [sequelize.literal('COUNT(user_id)'), 'DESC']
             ]
         });
-        // console.log(COUNT(user_id));
 
         // get the user details
-        const user = [];
+        const users = [];
 
         for (let i = 0; i < plannedTrips.length; i++) {
             const user_details = await userModel.findOne({
                 where: {
                     id: plannedTrips[i].user_id
                 },
-                attributes: ['firstName', 'lastName', 'username', 'profile_pic']
+                attributes: ['firstName', 'lastName', 'username', 'profile_pic', 'email']
             });
 
             // concat user's name
@@ -828,17 +827,21 @@ async function getPoints(req, res) {
                     break;
             }
 
-            // user details (name, username, profile_pic, account_type)
-            user.push(user_details.name);
-            user.push(user_details.username);
-            user.push(user_details.profile_pic);
-            user.push(account_type); 
+
+            users.push({
+                user_id: plannedTrips[i].user_id,
+                name: user_details.name,
+                username: user_details.username,
+                profile_pic: user_details.profile_pic,
+                email: user_details.email,
+                account_type: account_type,
+                trips: plannedTrips[i].dataValues.trips
+            });
         }
 
         res.status(200).send({
             message: "Users sorted successfully",
-            trips: plannedTrips,
-            users: user
+            leaders: users
         });
         
     } catch (err) {
