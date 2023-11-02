@@ -36,6 +36,7 @@ const {
     profileUpgradeRequests,
     approveRequest,
     rejectRequest,
+    trips,
 } =  require('../controller/adminController');
 
 
@@ -109,5 +110,9 @@ router.put('/approveRequest/:id', validateAdmin, approveRequest);
 // reject profile upgrade request
 router.put('/rejectRequest/:id', validateAdmin, rejectRequest);
 
+
+// *** Admin Panel ***
+// no of trips
+router.get('/trips', trips);
 
 module.exports = router;

@@ -1884,7 +1884,22 @@ async function rejectRequest(req, res) {
 
 
 // *** Admin Panel ***
+// get the no of trip planned '$baseUrl/admin/trips'
+async function trips(req, res) {
+    try {
+        const trips = await tripModel.count();
 
+        res.status(200).send({
+            message: "Trips found successfully",
+            trips: trips
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            message: "Server error"
+        });
+    }
+}
 
 
 module.exports = {
@@ -1917,5 +1932,6 @@ module.exports = {
     filterByRole,
     profileUpgradeRequests,
     approveRequest,
-    rejectRequest
+    rejectRequest,
+    trips
 };
