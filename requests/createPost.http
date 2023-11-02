@@ -1,0 +1,11 @@
+POST http://localhost:3000/user/createPost 
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImZpcnN0TmFtZSI6ImFtYXNoaSIsImxhc3ROYW1lIjoiYWJleSIsImVtYWlsIjoiYW1hc2hpQGdtYWlsLmNvbSIsImlhdCI6MTY5ODU4ODk5NSwiZXhwIjoxNzAxMTgwOTk1fQ.xbi0oNYGQG3V2b8OsREpiOpfFmgCt2DFxThwn7kJxdE
+
+{
+    "content": "Had a lovely time in the mountains #travel #nature #hiking",
+    "media" : "sac"
+    
+}
+
+# "media": "C:/Users/DELL/TravelMate/main/assets/post.png"

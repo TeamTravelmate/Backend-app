@@ -11,15 +11,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.User,{
+        foreignKey: 'user_id'
+      })
     }
   }
   vendor_essential.init({
     category: DataTypes.STRING,
     assential_name: DataTypes.STRING,
-    price: DataTypes.NUMERIC,
-    quantity: DataTypes.INTEGER,
-    seller_name: DataTypes.STRING,
-    address: DataTypes.STRING
+    user_id: DataTypes.INTEGER,
+    description: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'vendor_essential',

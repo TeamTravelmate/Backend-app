@@ -2,19 +2,23 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const { sequelize } = require('./models');
-
-
-const { register, login } = require('./controller/authController');
-const TripController = require('./controller/tripController');
-const UserController = require('./controller/userController');
-
 const app = express();
 const port = 3000;
 
+const cors = require('cors');
+app.use(cors());
+
+const tripRoutes = require('./routes/tripRoutes');
+const userRoutes = require('./routes/userRoutes');
+const searchRoutes = require('./routes/searchRoutes');
+const vendorRoutes = require('./routes/vendorRoutes');
+const followerRoutes = require('./routes/followerRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+
+app.use("/Images/pro_pic", express.static('Images/pro_pic'));
+app.use("/Images/post", express.static('Images/post'));
+
 app.use(bodyParser.json());
-
-const db = require('./models/');
-
 sequelize
   .authenticate()
   .then(() => {
@@ -30,9 +34,12 @@ app.get('/', (req, res) => {
   res.send('Welcome to TRAVELMATE!');
 })
 
-app.use('/user', UserController);
-app.use('/trip', TripController);
-
+app.use('/user', userRoutes);
+app.use('/trip', tripRoutes);
+app.use('/search', searchRoutes);
+app.use('/vendor', vendorRoutes);
+app.use('/follower', followerRoutes);
+app.use('/admin', adminRoutes);
 
 
 app.listen(port, () => {

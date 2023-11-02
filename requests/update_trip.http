@@ -1,11 +1,25 @@
 PUT http://localhost:3000/trip HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJlbWFpbCI6Imx1cW1hbl9mekBnbWFpbC5jb20iLCJpYXQiOjE2OTQ0MzAzMjAsImV4cCI6MTY5NzAyMjMyMH0._pn7MG_GIa93Y6ZqLMUdcTFluaEM3btWJY5PLqc5_vI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJlbWFpbCI6Imx1cW1hbl9mekBnbWFpbC5jb20iLCJpYXQiOjE2OTQ4NjkxNzMsImV4cCI6MTY5NzQ2MTE3M30.MsSmNs5j2IOkvHZCPIV0MCbR1EElJXhzPOBO7J4fDsY
 Content-Type: application/json
+#"id":3
+
+#Followed by any of these
+
+#"starting_date": "2023-12-12T18:30:00.000Z",
+#"category": "Private",
+#"no_of_days": 5,
+#"starting_place": "Nuwara Eliya",
+#"user_id": 1,
+#"destination": null,
+#"children_count": null,
+#"adult_count": null,
+#"route_id": null,
 
 {
-  "id":3,
+  "id":2,
   "destination": "Colombo",
   "children_count": 2,
-  "adult_count": 2
+  "adult_count": 2,
+  "category": "Public"
 }
 

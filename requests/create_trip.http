@@ -1,10 +1,10 @@
 POST http://localhost:3000/trip
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoibHVxbWFuX2Z6QGVtYWlsLmNvbSIsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJpYXQiOjE2OTQzMzc3NDMsImV4cCI6MTY5NDM0MTM0M30.cXI6IW_r48-sYI92FKpbqEPGJPMlsfKW6KJilwRG1Xo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImZpcnN0TmFtZSI6IlRlc3QiLCJsYXN0TmFtZSI6IlVzZXIiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwiaWF0IjoxNjk4NTgwOTAzLCJleHAiOjE3MDExNzI5MDN9.E3L7PpHQL3qUOaMhQNpQIS-pl-LaKDjG2uaNqCCufzA
 
 {
-    "startDate":"05/07/2023",
-    "numberOfDays": "5",
+    "startDate":"10/29/2023",
+    "numberOfDays": "3",
     "startPlace": "Galle",
-    "category": "PrivAte"
+    "category": "Private"
 }

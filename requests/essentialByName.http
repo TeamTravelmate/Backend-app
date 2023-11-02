@@ -1,0 +1,2 @@
+GET http://localhost:3000/trip/essential/2/umbrella HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJlbWFpbCI6Imx1cW1hbl9mekBlbWFpbC5jb20iLCJpYXQiOjE2OTUwMzQ4OTQsImV4cCI6MTY5NzYyNjg5NH0.royF6rbauhvezG4S-DjwHHU98HFaKJElzlZGoRuwmZM

@@ -16,6 +16,7 @@ async function getCategoryId(categoryName) {
             category_name: categoryName,
         });
         categoryId = newCategory.id;
+        return categoryId;
     }
     categoryId =  categoryId.id;
     return categoryId;

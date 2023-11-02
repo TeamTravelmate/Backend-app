@@ -1,21 +1,29 @@
 PUT http://localhost:3000/trip/budget HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZmlyc3ROYW1lIjoiTHVxbWFuIiwibGFzdE5hbWUiOiJGYXphbCIsImVtYWlsIjoibHVxbWFuX2Z6QGdtYWlsLmNvbSIsImlhdCI6MTY5NDQyMzQ2NywiZXhwIjoxNjk3MDE1NDY3fQ.IaJhVURWC9elb-gu0pH6i00qMNG2RzlWFssiAoS0yyU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImZpcnN0TmFtZSI6IkFtYXNoaSIsImxhc3ROYW1lIjoiU2FuZHVuaSIsImVtYWlsIjoiYW1hc2hpQGdtYWlsLmNvbSIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2OTg3NDA2MjIsImV4cCI6MTcwMTMzMjYyMn0.ifmeCVyapr2wx18c9jiCYYYLYEJy4PPl92rSy_zK5u4
 
 {
-    "budget": {
-        "id": 11
+    "budget":{
+      "id":10
     },
   "expenses": [
     {
       "expense_name": "Taxi",
-      "amount": 1001,
-      "category": "Transportation"
+      "amount": 4334,
+      "category": "transport",
+      "date" : "10/10/2023"
     },
     {
       "expense_name": "Hotel fare",
       "amount": 5000,
-      "category": "Accomodation"
+      "category": "accomodation",
+      "date" : "10/11/2023"
+    },
+    {
+      "expense_name": "Park Tickets",
+      "amount": 5000,
+      "category": "transport",
+      "date" : "10/12/2023"
     }
   ]
 }

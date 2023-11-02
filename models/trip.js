@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasOne(models.budget, {
+        foreignKey: 'tripID',
+      })
+      this.belongsTo(models.User, {
+        foreignKey: 'user_id'
+      })
     }
   }
   trip.init({
@@ -34,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
     route_id:{
       type: DataTypes.INTEGER,
       allowNull:true,
+    },
+    status: {
+      type: DataTypes.ENUM('active', 'inactive', 'completed'),
+      defaultValue: 'active'
     }
   }, {
     sequelize,

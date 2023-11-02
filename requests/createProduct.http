@@ -1,0 +1,29 @@
+POST http://localhost:3000/vendor/addProduct HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImZpcnN0TmFtZSI6Ikx1cW1hbiIsImxhc3ROYW1lIjoiRmF6YWwiLCJlbWFpbCI6Imx1cW1hbl9mekBnbWFpbC5jb20iLCJpYXQiOjE2OTY4NzE3MDUsImV4cCI6MTY5OTQ2MzcwNX0.V96ODC8cG-b70PlLytWZ-_sWkyc-nhtoVOiN0UZOvq0
+
+{
+    "category": "Camping",
+    "assential_name": "Tent",
+    "description": "Portable outdoor camping automatic tent, camping 5-8 people tent",
+    "product_details": [
+    {
+        "price": 2000,
+        "quantity": 2,
+        "colour": "Grey",
+        "size": "Small"
+    },
+    {
+        "price": 5000,
+        "quantity": 4,
+        "colour": "White",
+        "size": "Large"
+    },
+    {
+        "price": 8000,
+        "quantity": 1,
+        "colour": "Grey",
+        "size": "XL"
+    }
+  ]
+}

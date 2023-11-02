@@ -16,7 +16,7 @@ module.exports = {
         type: Sequelize.NUMERIC
       },
       category: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       userID: {
         type: Sequelize.INTEGER

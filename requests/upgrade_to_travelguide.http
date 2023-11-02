@@ -1,0 +1,14 @@
+POST http://localhost:3000/user/upgrade_travelguide
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImZpcnN0TmFtZSI6IkFtYXNoaSIsImxhc3ROYW1lIjoiU2hpbiIsImVtYWlsIjoiYW1hc2hpQGdtYWlsLmNvbSIsImlhdCI6MTY5ODM5OTY1MCwiZXhwIjoxNzAwOTkxNjUwfQ.jf2KCdGcPCZkhBoF2X9H1YgGue8WBnPNj6BbVQgkCnk
+
+{
+  "nic": "996595234V",
+  "nic_copy": "efdfdf",
+  "SLTDA_license": "yfhhdjfnd",
+  "language": "English",
+  "no_of_experience": 1,
+  "experience_field":"sdsfsfs",
+  "price_per_day": 10.00,
+  "status":0
+}

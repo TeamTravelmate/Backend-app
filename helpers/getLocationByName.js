@@ -7,6 +7,12 @@ async function getLocationByName(location) {
     const locationData = await locationModel.findOne({
       where: { name: location }
     });
+    if(locationData === null){
+      const newLocation = await locationModel.create({
+        name: location
+      });
+      return newLocation;
+    }
     return locationData;
   } catch (error) {
     console.error('Error retrieving location:', error);

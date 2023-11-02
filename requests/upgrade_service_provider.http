@@ -1,0 +1,7 @@
+POST http://localhost:3000/user/upgrade_service_provider
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImZpcnN0TmFtZSI6InNhY2hpbmkiLCJsYXN0TmFtZSI6InVzaGEiLCJlbWFpbCI6ImFtYXNoaUBnbWFpbC5jb20iLCJpYXQiOjE2OTg2Njg1MDcsImV4cCI6MTcwMTI2MDUwN30.CLUc4i7e-ww54NcGb024BHXEWvE5v9w0cAToWB94xZA
+
+{
+  "nic":"4494"
+}

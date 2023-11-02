@@ -1,0 +1,2 @@
+GET http://localhost:3000/admin/users/filter/provider HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNjk4NzcyNDI0LCJleHAiOjE3MDEzNjQ0MjR9.TKWqVDDQ6y4UIdQtcnZb3gtBlJM4FfG5p8V-lKddmuk
